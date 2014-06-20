@@ -1,4 +1,4 @@
-# This python program parses mutation calls from various programs, filters and annotates them
+# This is the master script for parsing mutation calls from various programs, filtering and annotating them.
 
 # Import relevant modules
 import sys
@@ -14,12 +14,13 @@ parser.add_argument('-fss','--somatic-sniper', help='Filter and annotate somatic
 parser.add_argument('-fsi','--somatic-indels', help='Filter and annotate somatic indel detector calls', required=False)
 parser.add_argument('-fmu','--mutect', help='Filter and annotate mutect calls', required=False)
 parser.add_argument('-fug','--unified-genotyper', help='Filter and annotate unified genotyper calls', required=False)
+parser.add_argument('-p','--path-file', help='Path file [Required]', required=True)
 
 # Get parser arguments
 args = vars(parser.parse_args())
 sample_file = args['sample_info']
 
-# Check the arguments of -r/--recalibrate, -mu/--mutect, -ss/--somatic-sniper, -si/--somatic-indels -ug/--unified-genotyper
+# Check the arguments of -r/--recalibrate, -mu/--mutect, -ss/--somatic-sniper, -si/--somatic-indels, -ug/--unified-genotyper, -p/--path-file
 if ((args['mutect'] != None) and (args['mutect'] != 'MUTECT')):
         print "Please check the argument of -mu/--mutect: It should be MUTECT"
         sys.exit(1)
@@ -31,6 +32,9 @@ if ((args['somatic_indels'] != None) and (args['somatic_indels'] != 'SOMATIC-IND
         sys.exit(1)
 if ((args['unified_genotyper'] != None) and (args['unified_genotyper'] != 'UNIFIED-GENOTYPER')):
         print "Please check the argument of -ug/--unified-genotyper: It should be UNIFIED-GENOTYPER"
+        sys.exit(1)
+if ((args['path_file'] != None) and (args['path_file'] != 'PATH-FILE')):
+        print "Please check the argument of -p/path-file: It should be PATH-FILE"
         sys.exit(1)
 
 # Set a flag if a particular call filtering is set 
