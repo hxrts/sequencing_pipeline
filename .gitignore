@@ -1,0 +1,5 @@
+*.bam
+*.bai
+*.DS_Store
+docs/
+refs/
