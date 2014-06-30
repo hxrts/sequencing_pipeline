@@ -1,6 +1,10 @@
-# This is the master script for parsing mutation calls from various programs, filtering and annotating them.
-
-# example file input: python master.py
+# --------------------------------------------------------------------------------------------------------
+# This master script tha parses the sample information provided by the user and calls mutations and indels
+# If there is a need to realign and recalibrate, it runs GATK realignment/recalibration scripts
+#
+# example file input: python master.py -s sample_info.txt -p path_file.txt -d test
+#
+# --------------------------------------------------------------------------------------------------------
 
 # Import relevant modules
 import sys
@@ -10,20 +14,35 @@ import argparse
 #------------------------------------------------------------------#
 # Parser Info
 #------------------------------------------------------------------#
-parser = argparse.ArgumentParser(description='This program parses mutation calls, filters and annotates them')
+parser = argparse.ArgumentParser(description='This program calls mutations and indels after indel realignment and recalibration. \
+					      It optionally does GATK realignment and recalibration.')
 parser.add_argument('-s','--sample-info', help='Sample information file [Required]', required=True)
-parser.add_argument('-fss','--somatic-sniper', help='Filter and annotate somatic sniper calls', required=False)
-parser.add_argument('-fsi','--somatic-indels', help='Filter and annotate somatic indel detector calls', required=False)
-parser.add_argument('-fmu','--mutect', help='Filter and annotate mutect calls', required=False)
-parser.add_argument('-fug','--unified-genotyper', help='Filter and annotate unified genotyper calls', required=False)
-parser.add_argument('-p','--path-file', help='Path file [Required]', required=True)
+parser.add_argument('-d','--directory', help='Temproary directory name to create [Required]',required=True)
+parser.add_argument('-r','--recalibrate', help='Option to realign and recalibrate', required=False)
+parser.add_argument('-b','--bedfile', help='Option to realign/recalibrate only on the specified intervals given by the bed file', required=False)
+parser.add_argument('-ov','--only-variants', help='Option to call only variants when the recalibrated files are locally present', required=False)
+parser.add_argument('-mu','--mutect', help='Option to use only mutect', required=False)
+parser.add_argument('-ss','--somatic-sniper', help='Option to use only somatic sniper',required=False)
+parser.add_argument('-si','--somatic-indels', help='Option to use only somatic indel detector',required=False)
+parser.add_argument('-ug','--unified-genotyper', help='Option to use only unified genotyper',required=False)
+parser.add_argument('-p','--path-file', help='Specifies path file',required=True)
+#------------------------------------------------------------------#
+# Get parser arguments and check validity
+#------------------------------------------------------------------#
 
-# Get parser arguments
 args = vars(parser.parse_args())
 sample_file = args['sample_info']
+directory_name = args['directory']
+bedfile_name = args['bedfile']
 exdir = os.path.dirname(__file__)
 
-# Check the arguments of -r/--recalibrate, -mu/--mutect, -ss/--somatic-sniper, -si/--somatic-indels, -ug/--unified-genotyper, -p/--path-file
+# Check the arguments of -r/--recalibrate, -mu/--mutect, -ss/--somatic-sniper, -si/--somatic-indels -ug/--unified-genotyper
+if ((args['recalibrate'] != None) and (args['recalibrate'] != 'RECALIBRATE')):
+	print "Please check the argument of -r/--recalibrate: It should be RECALIBRATE"
+	sys.exit(1)
+if ((args['only_variants'] != None) and (args['only_variants'] != 'ONLY-VARIANTS')):
+        print "Please check the argument of -ov/--only-variants: It should be ONLY-VARIANTS"
+        sys.exit(1)
 if ((args['mutect'] != None) and (args['mutect'] != 'MUTECT')):
         print "Please check the argument of -mu/--mutect: It should be MUTECT"
         sys.exit(1)
@@ -36,30 +55,51 @@ if ((args['somatic_indels'] != None) and (args['somatic_indels'] != 'SOMATIC-IND
 if ((args['unified_genotyper'] != None) and (args['unified_genotyper'] != 'UNIFIED-GENOTYPER')):
         print "Please check the argument of -ug/--unified-genotyper: It should be UNIFIED-GENOTYPER"
         sys.exit(1)
-if ((args['path_file'] != None) and (args['path_file'] != 'PATH-FILE')):
-        print "Please check the argument of -p/path-file: It should be PATH-FILE"
-        sys.exit(1)
+#-------------------------------------------------------------#
+# If none of the options for -mu, -ss, -si are given, then
+# execute all the callers by setting the flag to 1
+#-------------------------------------------------------------#
+if ((args['mutect'] == None) and (args['somatic_sniper'] == None) and (args['somatic_indels'] == None) and (args['unified_genotyper'] == None)):
+	mutect_flag = 1
+	somatic_sniper_flag = 1
+	somatic_indel_flag = 1
+	unified_genotyper_flag = 1
 
-# Set a flag if a particular call filtering is set 
+if (args['only_variants'] == None):
+	only_variants_flag = 0
+#-------------------------------------------------------------#
+# Otherwise execute only the required caller by setting the 
+# callers flag as 1 and other callers flag as 0
+#-------------------------------------------------------------#
 if (args['mutect'] != None):
 	mutect_flag = 1
-else:
-	mutect_flag = 0
-if (args['somatic_sniper'] != None):
-	somatic_sniper_flag = 1
-else:
 	somatic_sniper_flag = 0
-if (args['somatic_indels'] != None):
-	somatic_indels_flag = 1
-else:
-	somatic_indels_flag = 0
-if (args['unified_genotyper'] != None):
-	unified_genotyper_flag = 1
-else:
+	somatic_indel_flag = 0
 	unified_genotyper_flag = 0
-#---------------------------------------------------------------------#
-# If sample info path exists then read the file 
-#---------------------------------------------------------------------# 
+if (args['somatic_sniper'] != None):
+	mutect_flag = 0
+	somatic_sniper_flag = 1
+	somatic_indel_flag = 0
+	unified_genotyper_flag = 0
+if (args['somatic_indels'] != None):
+	mutect_flag = 0
+	somatic_sniper_flag = 0
+	somatic_indel_flag = 1
+	unified_genotyper_flag = 0
+if (args['unified_genotyper'] != None):
+        mutect_flag = 0
+        somatic_sniper_flag = 0
+        somatic_indel_flag = 0
+        unified_genotyper_flag = 1
+if ((args['bedfile'] != None)):
+	bedfile_flag = 1
+else:
+	bedfile_flag = 0
+if (args['only_variants'] != None):
+	only_variants_flag = 1
+#------------------------------------------------------------------#
+# If sample info path exists then read the file & execute pipeline
+#------------------------------------------------------------------# 
 if (os.path.exists(sample_file)==True):
 
 	# Open the input tab-delimited file
@@ -91,191 +131,240 @@ if (os.path.exists(sample_file)==True):
 
         	count=count+1
 
-	# Define paths to the directories and tools
-	if (somatic_sniper_flag == 1):
-		mutation_directory = path[1]+"/"+"somatic_sniper"
-		SS_PARSER_PATH = "/hopp-storage/HOPP-TOOLS/PIPELINES/MutPipelines/scripts/ss-variants-to-table.sh"
-	if (somatic_indels_flag == 1):
-		mutation_directory = path[1]+"/"+"somatic_indel_detector"
-        	SI_PARSER_PATH = "/hopp-storage/HOPP-TOOLS/PIPELINES/MutPipelines/scripts/si-variants-to-table.sh"
-	if (mutect_flag == 1):
-		mutation_directory = path[1]+"/"+"mutect"
-		MUTECT_PARSER_PATH = "/hopp-storage/HOPP-TOOLS/PIPELINES/MutPipelines/scripts/mu-variants-to-table.sh"
+	# Make a temproary directory in the path only if only variants flag is zero
+	directory = path[1]+"/TMP"+"-"+directory_name
+	if (only_variants_flag == 0):
+		if not os.path.exists(directory):
+    			os.makedirs(directory)
+		else:
+			os_call = "rm -rf "+ directory
+			os.system(os_call)
+			os.makedirs(directory)
 
-	# Define the paths to the tools
-	ANNOVAR = os.path.join(exdir, '/tools/annovar/annotate_variation.pl -buildver hg19')
-	ANNOVAR_DB = os.path.join(exdir, '/tools/annovar/humandb')
-	otg_ANNO = os.path.join(exdir, '/scripts/annotate-1000g-calls.sh')
-	ESP_ANNO = os.path.join(exdir, '/scripts/annotate-ESP-calls.sh')
-	dbSNP_ANNO = os.path.join(exdir, '/scripts/annotate-dbSNP-calls.sh')
-	COSMIC_ANNO = os.path.join(exdir, '/scripts/annotate-cosmic-calls.sh')
+	# Check if the recalibration flag is on and in that case make a folder for storing raw bams
+	if (only_variants_flag == 0):
+		if (args['recalibrate'] == 'RECALIBRATE'):
+			os.makedirs(directory + "/raw_bams")
+			os.makedirs(directory + "/recalibrated_bams")
+		else:
+			os.makedirs(directory + "/recalibrated_bams")
+	
+	# Make directories for results
+	somatic_sniper_directory = path[1] + "/somatic_sniper" 
+	somatic_indel_directory = path[1] + "/somatic_indel_detector"
+	mutect_directory = path[1]+"/mutect"
+	unified_genotyper_directory = path[1]+"/unified_genotyper"
 
-	# Make a filter directory if it does not exist
-        filter_directory = mutation_directory+"/"+"filter"
-        if not os.path.exists(filter_directory):
-                os.makedirs(filter_directory)
+	if not os.path.exists(somatic_sniper_directory):
+		if (somatic_sniper_flag == 1):
+			os.makedirs(somatic_sniper_directory)
+        if not os.path.exists(somatic_indel_directory): 
+		if (somatic_indel_flag == 1):       
+			os.makedirs(somatic_indel_directory)
+	if not os.path.exists(mutect_directory):
+		if (mutect_flag == 1):
+			os.makedirs(mutect_directory)
+	if not os.path.exists(unified_genotyper_directory):
+		if (unified_genotyper_flag == 1):
+			os.makedirs(unified_genotyper_directory)
+
+	#-------------------------------------------------------------#
+	# Define paths for the required programs
+	#-------------------------------------------------------------#
+	# GATK pipeline path
+	GATK_PATH = os.path.join(exdir, '/scripts/pipelineGATK.sh')
+	# GATK interval script path
+	GATK_INTERVAL_PATH = os.path.join(exdir, '/scripts/pipelineIntervalGATK.sh')
+	# samtools path
+	SAM_INDEX_PATH = os.path.join(exdir, '/GATKBundle/samtools/samtools index')
+	# somatic sniper path
+	SOMATIC_SNIPER_PATH = os.path.join(exdir, '/scripts/call-somatic-sniper.sh')
+	# somatic indel_detector path
+	SOMATIC_INDEL_PATH = os.path.join(exdir, '/scripts/call-indels.sh')
+	# somatic indel path with intervals
+	SOMATIC_INDEL_INTERVAL_PATH = os.path.join(exdir, '/scripts/call-indels-with-intervals.sh')
+	# mutect path
+	MUTECT_PATH = os.path.join(exdir, '/scripts/call-mutect.sh')
+	# mutect path with intervals
+	MUTECT_INTERVAL_PATH = os.path.join(exdir, '/scripts/call-mutect-with-intervals.sh')
+	# unified genotyper path
+	UNIFIED_GENOTYPER_PATH = os.path.join(exdir, '/scripts/call-genotyper.sh')
+	# unified genotyper with intervals
+	UNIFIED_GENOTYPER_INTERVAL_PATH = os.path.join(exdir, '/scripts/call-genotyper-with-intervals.sh')
+	#-------------------------------------------------------------#
 
 	# For each sample specified in the sample info file do the processing
 	for i in range(len(sample_name)):
+		
+        	# Status information
+		print "-------------------------------------------------------------"
+        	print "Processing sample "+sample_name[i]
+		print "-------------------------------------------------------------"
+		sys.stdout.flush()	
+		# We call copying and realignment/recalibration scripts only if "only_variants_flag" is zero
+		if (only_variants_flag == 0):
+			# If we need to do realignment and recalibration copy the raw bams in the local directory and execute GATK
+			if (args['recalibrate'] == 'RECALIBRATE'):
+				
+				# First copy the normal and tumor files to the local directory
+				normal_directory = directory + "/raw_bams" + "/" + sample_name[i] + "_NL"
+				tumor_directory = directory + "/raw_bams" + "/" + sample_name[i] + "_TU"
+				os.makedirs(normal_directory)
+				os.makedirs(tumor_directory)
+				print "Copying normal bam file to the local folder"
+				sys.stdout.flush()
+				os_call = "cp "+path[0]+"/"+normal_bam_file[i]+" "+normal_directory
+				os.system(os_call)
+				print "Copying tumor bam file to the local folder"
+				sys.stdout.flush()
+				os_call = "cp "+path[0]+"/"+tumor_bam_file[i]+" "+tumor_directory
+				os.system(os_call)
+		
+				# Call GATK pipeline to the tumor and normal files locally stored
+				if (bedfile_flag == 1):
+					print "Calling GATK interval pipeline on the normal and tumor bams"
+                                	print "-------------------------------------------------------------"
+                                	sys.stdout.flush()
+                                	os_call = GATK_INTERVAL_PATH+" "+normal_directory+"/"+normal_bam_file[i]+" "+bedfile_name
+                                	os.system(os_call)
+                                	os_call = GATK_INTERVAL_PATH+" "+tumor_directory+"/"+tumor_bam_file[i]+" "+bedfile_name
+                                	os.system(os_call)
+				else:
+					print "Calling GATK pipeline on the normal and tumor bams"
+					print "-------------------------------------------------------------"
+					sys.stdout.flush()
+					os_call = GATK_PATH+" "+normal_directory+"/"+normal_bam_file[i]
+					os.system(os_call)
+					os_call = GATK_PATH+" "+tumor_directory+"/"+tumor_bam_file[i]
+					os.system(os_call)
 
-		# Make a tab delimed file in the mutation directory for writing
-		wrt_file = mutation_directory+"/"+sample_name[i]+"-SOMATIC.tab"
-		print "----------------------------------------------------------------------------"		
-		print "Pulling somatic mutations for "+sample_name[i]+" and making tab-delimed format"
-		print "----------------------------------------------------------------------------"
+				# Make directory for storing the recalibrated bams
+				normal_recalibrated_directory = directory + "/recalibrated_bams" + "/" + sample_name[i] + "_NL"
+				tumor_recalibrated_directory = directory + "/recalibrated_bams" + "/" + sample_name[i] + "_TU"
+				os.makedirs(normal_recalibrated_directory)
+				os.makedirs(tumor_recalibrated_directory)
+				# Copy the recalibrated bams to the required directory
+				print "Copying recalibrated normal file to the recalibrated folder"
+				sys.stdout.flush()
+				os_call = "cp "+normal_directory+"/"+"out.recal.quality.bam"+" "+normal_recalibrated_directory+"/"
+				os.system(os_call)
+				os_call = "cp "+normal_directory+"/"+"out.recal.quality.bam.bai"+" "+normal_recalibrated_directory+"/"
+                        	os.system(os_call)
+				print "Copying recalibrated tumor file to the recalibrated folder"
+				sys.stdout.flush()
+                        	os_call = "cp "+tumor_directory+"/"+"out.recal.quality.bam"+" "+tumor_recalibrated_directory+"/"
+                        	os.system(os_call)
+				os_call = "cp "+tumor_directory+"/"+"out.recal.quality.bam.bai"+" "+tumor_recalibrated_directory+"/"
+                        	os.system(os_call)
+				#-------------------------------------------------------------#
+				# Copy the recalibrated files to the original path
+				#-------------------------------------------------------------#
+				print "Copying recalibrated normal bam files to HOPP storage server"
+				sys.stdout.flush()
+                		os_call = "cp"+" "+normal_recalibrated_directory+"/out.recal.quality.bam"+" "+path[0]+"/"+"recalibrated-"+normal_bam_file[i]
+                		os.system(os_call)
+                		os_call = "cp"+" "+normal_recalibrated_directory+"/out.recal.quality.bam.bai"+" "+path[0]+"/"+"recalibrated-"+normal_bam_file[i]+".bai"
+                		os.system(os_call)
+                		print "Copying recalibrated tumor bam files to HOPP storage server"
+				sys.stdout.flush()
+                		os_call = "cp"+" "+tumor_recalibrated_directory+"/out.recal.quality.bam"+" "+path[0]+"/"+"recalibrated-"+tumor_bam_file[i]
+                		os.system(os_call)
+                		os_call = "cp"+" "+tumor_recalibrated_directory+"/out.recal.quality.bam.bai"+" "+path[0]+"/"+"recalibrated-"+tumor_bam_file[i]+".bai"
+                		os.system(os_call)
+			else:
+				# If there is no recalibration necessary, make directories for storing the recalibrated bams
+                        	normal_recalibrated_directory = directory + "/recalibrated_bams" + "/" + sample_name[i] + "_NL"
+                        	tumor_recalibrated_directory = directory + "/recalibrated_bams" + "/" + sample_name[i] + "_TU"
+                        	os.makedirs(normal_recalibrated_directory)
+                        	os.makedirs(tumor_recalibrated_directory)
+				# Copy the recalibrated bams to the required directory			
+				print "Copying recalibrated normal file to the folder"
+				sys.stdout.flush()
+                        	os_call = "cp "+path[0]+"/"+normal_bam_file[i]+" "+normal_recalibrated_directory+"/"+"out.recal.quality.bam"
+                        	os.system(os_call)
+				print "Indexing the recalibrated normal bam file"
+				sys.stdout.flush()
+				os_call = SAM_INDEX_PATH+" "+normal_recalibrated_directory+"/"+"out.recal.quality.bam"
+                        	os.system(os_call)
+                        	print "Copying recalibrated tumor file to the folder"
+				sys.stdout.flush()
+				os_call = "cp "+path[0]+"/"+tumor_bam_file[i]+" "+tumor_recalibrated_directory+"/"+"out.recal.quality.bam"
+                        	os.system(os_call)
+                        	print "Indexing the recalibrated tumor bam file"
+				sys.stdout.flush()
+                        	os_call = SAM_INDEX_PATH+" "+tumor_recalibrated_directory+"/"+"out.recal.quality.bam"
+                        	os.system(os_call)
+		#-------------------------------------------------------------#
+		# Call somatic sniper and somatic indel detector and mutect
+		# depending on the flag. If none specified all the flags are
+		# set to 1 and hence all callers will be executed
+		#-------------------------------------------------------------#
+		
+		# Define normal and tumor directories
+		normal_recalibrated_directory = directory + "/recalibrated_bams" + "/" + sample_name[i] + "_NL"
+                tumor_recalibrated_directory = directory + "/recalibrated_bams" + "/" + sample_name[i] + "_TU"
+		recalibrated_normal_file = normal_recalibrated_directory+"/"+"out.recal.quality.bam"
+		recalibrated_tumor_file = tumor_recalibrated_directory+"/"+"out.recal.quality.bam"
+
+		# Check if the recalibrated files exists
+		if not os.path.exists(recalibrated_normal_file):
+			print 'Recalibrated normal file  not existant'
+			sys.exit(1)
+		if not os.path.exists(recalibrated_tumor_file):
+			print 'Recalibrated tumor file  not existant'
+                        sys.exit(1)
+		# Check of the appropriate callers are present and if so make calls	
 		if (somatic_sniper_flag == 1):
-			print "Converting somatic sniper vcf for "+sample_name[i]+" to tab-delimed format"
-			somatic_sniper_directory = mutation_directory
-			# Call the script to extract somatic sniper vcf calls and make it into table
-			os_call = SS_PARSER_PATH+" "+somatic_sniper_directory+" "+sample_name[i]
+			print "-------------------------------------------------------------"
+			print "Calling somatic mutations using Somatic Sniper"
+			sys.stdout.flush()
+			os_call = SOMATIC_SNIPER_PATH+" "+tumor_recalibrated_directory+" "+normal_recalibrated_directory+" "+somatic_sniper_directory+" "+sample_name[i]
 			os.system(os_call)
-			# The above script creates a temproary folder in the path[1]/somatic_sniper folder
-			# which has a temproary tab-delimited file that needs to be parsed to make it into annovar format
-			# Read the tab-delimited temprory file in path[1]/somatic_sniper/tmp directory
-			tmp_file = somatic_sniper_directory+"/"+"tmp"+"/"+sample_name[i]+".tmp2"
-			myTmpTabFile = csv.reader(open(tmp_file, "rU"), delimiter='\t', quotechar='|')
-			open_wrt_file = open(wrt_file, "wb")
-			myWrtFile = csv.writer(open_wrt_file,delimiter='\t')
-			for row in myTmpTabFile:
-				# Column 3 is the ref base and columns 7 through 10 are the number of reads 
-				# supporting A,C,G,T in that order
-				if (row[3] == 'A'):
-					ref_reads = row[7]
-				if (row[3] == 'C'):
-					ref_reads = row[8]
-				if (row[3] == 'G'):
-                                	ref_reads = row[9]
-                        	if (row[3] == 'T'):
-                                	ref_reads = row[10]
-				# Column 4 is the alt base and columns 11 through 14 are the number of reads
-				# supporting A,C,G,T in that order
-				if (row[4] == 'A'):
-                                	alt_reads = row[11]
-                        	if (row[4] == 'C'):
-                                	alt_reads = row[12]
-				if (row[4] == 'G'):
-                                	alt_reads = row[13]
-				if (row[4] == 'T'):
-                                	alt_reads = row[14]
-
-				# Compute normal and tumor allelic frequencies
-				normal_allelic_frequency = round((float(ref_reads)/float(row[5]))*100,2)
-				tumor_allelic_frequency = round((float(alt_reads)/float(row[6]))*100,2)
-				# Filter only somatic mutations, where the germline almost matches reference genome (upto 95%)
-				if ((float(row[5]) != 0.0) and normal_allelic_frequency > 95):
-					mutation_row = [row[0],row[1],row[2],row[3],row[4],row[5],row[6], \
-							normal_allelic_frequency,tumor_allelic_frequency,row[15],sample_name[i], "somatic-sniper", \
-							sample_name[i]+":"+row[0]+":"+row[1],"point-mutation","1"]
-					myWrtFile.writerow(mutation_row)
-
-		if (somatic_indels_flag == 1):
-			somatic_indel_directory = mutation_directory
-                	print "Converting somatic indel detector vcf for "+sample_name[i]+" to tab-delimed format"
-                	# Call the script to extract somatic indel vcf calls and make it into table
-                	os_call = SI_PARSER_PATH+" "+somatic_indel_directory+" "+sample_name[i]
-                	os.system(os_call)
-                	# The above script creates a temproary folder in the path[1]/somatic_indel_detector folder
-                	# which has a temproary tab-delimited file that needs to be parsed to make it into annovar format
-                	# Read the tab-delimited temprory file in path[1]/somatic_indel_detector/tmp directory
-                	tmp_file = somatic_indel_directory+"/"+"tmp"+"/"+sample_name[i]+".tmp2"
-                	myTmpTabFile = csv.reader(open(tmp_file, "rU"), delimiter='\t', quotechar='|')
-                	# Make a file in the somatic indel directory and write the output to the file
-			open_wrt_file = open(wrt_file, "wb")
-                        myWrtFile = csv.writer(open_wrt_file,delimiter='\t')
-                	for row in myTmpTabFile:
-				# Check if it is a insertion or a deletion by finding the number of bases
-                        	if (row[3] == "-"):
-                                	mutation_row = [row[0],row[1],row[2],row[3],row[4],row[5],row[6], \
-                                        	        row[7],row[8],row[9],sample_name[i], "somatic-indel-dectector", \
-                                                	sample_name[i]+":"+row[0]+":"+row[1],"insertion","1"]
-                        	elif (row[4] == "-"):
-                                	mutation_row = [row[0],row[1],row[2],row[3],row[4],row[5],row[6], \
-                                        	        row[7],row[8],row[9],sample_name[i], "somatic-indel-dectector", \
-                                                	sample_name[i]+":"+row[0]+":"+row[1],"deletion","1"]
-                        	else:
-                                	mutation_row = [row[0],row[1],row[2],row[3],row[4],row[5],row[6], \
-                                        	        row[7],row[8],row[9],sample_name[i], "somatic-indel-dectector", \
-                                                	sample_name[i]+":"+row[0]+":"+row[1],"del-or-ins","1"]
-                        	myWrtFile.writerow(mutation_row)
-	
+		if (somatic_indel_flag == 1):
+			if (bedfile_flag == 1):
+				print "-------------------------------------------------------------"
+                        	print "Calling somatic indels with intervals list"
+                        	print "-------------------------------------------------------------"
+                        	sys.stdout.flush()
+                        	os_call = SOMATIC_INDEL_INTERVAL_PATH+" "+normal_recalibrated_directory+" "+tumor_recalibrated_directory+" "+somatic_indel_directory+" "+sample_name[i]+" "+bedfile_name
+                        	os.system(os_call)
+			else:
+				print "-------------------------------------------------------------"
+				print "Calling somatic indels"
+				print "-------------------------------------------------------------"
+				sys.stdout.flush()
+				os_call = SOMATIC_INDEL_PATH+" "+normal_recalibrated_directory+" "+tumor_recalibrated_directory+" "+somatic_indel_directory+" "+sample_name[i]
+				os.system(os_call)
 		if (mutect_flag == 1):
-			mutect_directory = mutation_directory
-			print "Converting mutect file for "+sample_name[i]+" to tab-delimited format"
-			# Call the script to extract "KEEP" mutect calls and make it into table
-			os_call = MUTECT_PARSER_PATH+" "+mutect_directory+" "+sample_name[i]
-			os.system(os_call)
-			# The above script creates a temproary folder in the path[1]/mutect folder
-                        # which has a temproary tab-delimited file that needs to be parsed to make it into annovar format
-                        # Read the tab-delimited temprory file in path[1]/mutect_detector/tmp directory
-			tmp_file = mutect_directory+"/"+"tmp"+"/"+sample_name[i]+".tmp2"
-			myTmpTabFile = csv.reader(open(tmp_file, "rU"), delimiter='\t', quotechar='|')
-                        # Make a file in the somatic indel directory and write the output to the file
-                        open_wrt_file = open(wrt_file, "wb")
-                        myWrtFile = csv.writer(open_wrt_file,delimiter='\t')
-			for row in myTmpTabFile:
-				mutation_row = [row[0],row[1],row[2],row[3],row[4],row[5],row[6], \
-                                		row[7],row[8],row[9],sample_name[i], "mutect", \
-                               			sample_name[i]+":"+row[0]+":"+row[1],"point-mutation","1"]
-				myWrtFile.writerow(mutation_row)
-
-		open_wrt_file.close()
-
-		# Filter the above somatic mutations through cosmic
-		print "----------------------------------------------------------------------------"
-		print "Filtering somatic mutations through cosmic"
-		print "----------------------------------------------------------------------------"
-		os_call = ANNOVAR+" "+"-filter -dbtype cosmic64"+" "+wrt_file+" "+"-outfile"+" "+filter_directory+"/"+sample_name[i]+" "+ANNOVAR_DB+"/COSMIC"
-		os.system(os_call)
-
-		# Annotate cosmic filtered mutations
-		print "----------------------------------------------------------------------------"
-		print "Annotating cosmic filtered mutations"
-		print "----------------------------------------------------------------------------"
-		os_call = COSMIC_ANNO+" "+filter_directory+" "+sample_name[i]
-		os.system(os_call)
-		
-		# Filter somatic  mutations through 1000g
-		print "----------------------------------------------------------------------------"
-		print "Filtering somatic mutations through 1000g"
-		print "----------------------------------------------------------------------------"
-		os_call = ANNOVAR+" "+"-filter -dbtype 1000g2010nov_all"+" "+wrt_file+" "+"-outfile"+" "+filter_directory+"/"+sample_name[i]+" "+ANNOVAR_DB+"/1000g"
-		os.system(os_call)
-	
-                # Annotate 1000g filtered mutations
-                print "----------------------------------------------------------------------------"
-                print "Annotating 1000g filtered mutations"
-                print "----------------------------------------------------------------------------"
-                os_call = otg_ANNO+" "+filter_directory+" "+sample_name[i]
-                os.system(os_call)
-	
-		# Filter somatic mutations through ESP5400
-		print "----------------------------------------------------------------------------"
-		print "Filtering somatic filtered mutations through ESP5400"
-		print "----------------------------------------------------------------------------"
-		os_call = ANNOVAR+" "+"-filter -dbtype vcf -vcfdbfile ESP5400.vcf"+" "+wrt_file+" "+"-outfile"+" "+filter_directory+"/"+sample_name[i]+" "+ANNOVAR_DB+"/ESP"
-		os.system(os_call)
-		
-                # Annotate ESP5400 filtered mutations
-                print "----------------------------------------------------------------------------"
-                print "Annotating ESP5400 filtered mutations"
-                print "----------------------------------------------------------------------------"
-                os_call = ESP_ANNO+" "+filter_directory+" "+sample_name[i]
-                os.system(os_call)
-
-		# Filter somatic filtered mutations through dbSNP132
-		print "----------------------------------------------------------------------------"
-                print "Filtering somatic filtered mutations through dbSNP132"
-                print "----------------------------------------------------------------------------"
-		os_call = ANNOVAR+" "+"-filter -dbtype snp132"+" "+wrt_file+" "+"-outfile"+" "+filter_directory+"/"+sample_name[i]+" "+ANNOVAR_DB+"/dbSNP"
-		os.system(os_call)
-		
-		# Annotate dbSNP132 filtered mutations
-		print "----------------------------------------------------------------------------"
-                print "Annotating dbSNP132 filtered mutations"
-                print "----------------------------------------------------------------------------"
-                os_call = dbSNP_ANNO+" "+filter_directory+" "+sample_name[i]
-                os.system(os_call)
-
+			if (bedfile_flag == 1):
+				print "-------------------------------------------------------------"
+                        	print "Calling MuTect with intervals list"
+                        	print "-------------------------------------------------------------"
+                        	sys.stdout.flush()
+                        	os_call = MUTECT_INTERVAL_PATH+" "+tumor_recalibrated_directory+" "+normal_recalibrated_directory+" "+mutect_directory+" "+sample_name[i]+" "+bedfile_name
+                        	os.system(os_call)
+			else:
+				print "-------------------------------------------------------------"
+				print "Calling MuTect..."
+				print "-------------------------------------------------------------"
+				sys.stdout.flush()
+				os_call = MUTECT_PATH+" "+tumor_recalibrated_directory+" "+normal_recalibrated_directory+" "+mutect_directory+" "+sample_name[i]
+				os.system(os_call)
+		if (unified_genotyper_flag == 1):
+			if (bedfile_flag == 1):
+				print "-------------------------------------------------------------"
+                        	print "Calling Unified Genotyper with intervals list"
+                        	print "-------------------------------------------------------------"
+                        	sys.stdout.flush()
+                        	os_call = UNIFIED_GENOTYPER_INTERVAL_PATH+" "+tumor_recalibrated_directory+" "+normal_recalibrated_directory+" "+unified_genotyper_directory+" "+sample_name[i]+" "+bedfile_name
+                        	os.system(os_call)
+			else:
+				print "-------------------------------------------------------------"
+				print "Calling Unified Genotyper on all intervals"
+                       		print "-------------------------------------------------------------"
+                        	sys.stdout.flush()
+                        	os_call = UNIFIED_GENOTYPER_PATH+" "+tumor_recalibrated_directory+" "+normal_recalibrated_directory+" "+unified_genotyper_directory+" "+sample_name[i]
+                        	os.system(os_call)
 else:
 	print 'Sample information file is non-existent. Please make sure you give valid sample info file with path.'
-	sys.exit(1)	 
+	sys.exit(1)

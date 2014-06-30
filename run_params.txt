@@ -1,3 +1,0 @@
-BAMPath	/mnt/ChanLab/HCC/Batch2/bams
-LOCPath	/hopp-storage/LABS/ChanLab/Ian/HCC/data
-s_GA_1	s_GA_NL1__1.bam	s_GA_T1__1.bam		
