@@ -5,7 +5,6 @@
 # Path to the GATK and reference genome
 GAT0=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/Somatic-Indel-Detector/GATK/dist/GenomeAnalysisTK.jar
 REF=/home/sam/HOPP-Informatics/projects/MutPipeline/Homo_sapiens_assembly19.fasta
-#REF=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/reference/human_hg19.fasta
 
 java -Xmx8g -jar "$GAT0" -R "$REF" -T SomaticIndelDetector -mnr 50000  \
 							   -minConsensusFraction 0.7 \

@@ -176,7 +176,7 @@ if (os.path.exists(sample_file)==True):
 	# GATK interval script path
 	GATK_INTERVAL_PATH = os.path.join(exdir, '/scripts/pipelineIntervalGATK.sh')
 	# samtools path
-	SAM_INDEX_PATH = os.path.join(exdir, '/GATKBundle/samtools/samtools index')
+	SAM_INDEX_PATH = os.path.join(exdir, '/tools/samtools-0.1.19/samtools index')
 	# somatic sniper path
 	SOMATIC_SNIPER_PATH = os.path.join(exdir, '/scripts/call-somatic-sniper.sh')
 	# somatic indel_detector path

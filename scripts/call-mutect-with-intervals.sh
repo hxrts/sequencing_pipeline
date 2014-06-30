@@ -2,7 +2,6 @@
 MUTECT_PATH_VER10=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/MuTect/version-1.0/muTect-1.0.27783-bin-BETA/muTect-1.0.27783.jar
 MUTECT_PATH_VER14=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/MuTect/version-1.4/muTect-1.1.4.jar
 REF=/home/sam/HOPP-Informatics/projects/MutPipeline/Homo_sapiens_assembly19.fasta
-#REF=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/reference/human_hg19.fasta
 COSMIC=/hopp-storage/HOPP-TOOLS/PIPELINES/MutTools/MuTect/version-1.0/hg19_cosmic_v54_120711.vcf
 DBSNP=/hopp-storage/HOPP-TOOLS/PIPELINES/MutTools/MuTect/version-1.0/dbsnp_132_b37.leftAligned.vcf
 
