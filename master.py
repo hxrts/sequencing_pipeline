@@ -1,5 +1,7 @@
 # This is the master script for parsing mutation calls from various programs, filtering and annotating them.
 
+# example file input: python master.py
+
 # Import relevant modules
 import sys
 import csv
@@ -19,6 +21,7 @@ parser.add_argument('-p','--path-file', help='Path file [Required]', required=Tr
 # Get parser arguments
 args = vars(parser.parse_args())
 sample_file = args['sample_info']
+exdir = os.path.dirname(__file__)
 
 # Check the arguments of -r/--recalibrate, -mu/--mutect, -ss/--somatic-sniper, -si/--somatic-indels, -ug/--unified-genotyper, -p/--path-file
 if ((args['mutect'] != None) and (args['mutect'] != 'MUTECT')):
@@ -99,13 +102,13 @@ if (os.path.exists(sample_file)==True):
 		mutation_directory = path[1]+"/"+"mutect"
 		MUTECT_PARSER_PATH = "/hopp-storage/HOPP-TOOLS/PIPELINES/MutPipelines/scripts/mu-variants-to-table.sh"
 
-	# Define the paths to the tools	
-	ANNOVAR = "/hopp-storage/HOPP-TOOLS/ANNOTATIONS/annovar-may-2013/annovar/annotate_variation.pl -buildver hg19"
-	ANNOVAR_DB = "/hopp-storage/HOPP-TOOLS/ANNOTATIONS/annovar-may-2013/annovar/humandb"
-	1000g_ANNO = "/hopp-storage/HOPP-TOOLS/PIPELINES/MutPipelines/scripts/annotate-100g-calls.sh"
-	ESP_ANNO = "/hopp-storage/HOPP-TOOLS/PIPELINES/MutPipelines/scripts/annotate-ESP-calls.sh"
-	dbSNP_ANNO = "/hopp-storage/HOPP-TOOLS/PIPELINES/MutPipelines/scripts/annotate-dbSNP-calls.sh"
-	COSMIC_ANNO = "/hopp-storage/HOPP-TOOLS/PIPELINES/MutPipelines/scripts/annotate-cosmic-calls.sh"
+	# Define the paths to the tools
+	ANNOVAR = os.path.join(exdir, '/tools/annovar/annotate_variation.pl -buildver hg19')
+	ANNOVAR_DB = os.path.join(exdir, '/tools/annovar/humandb')
+	otg_ANNO = os.path.join(exdir, '/scripts/annotate-1000g-calls.sh')
+	ESP_ANNO = os.path.join(exdir, '/scripts/annotate-ESP-calls.sh')
+	dbSNP_ANNO = os.path.join(exdir, '/scripts/annotate-dbSNP-calls.sh')
+	COSMIC_ANNO = os.path.join(exdir, '/scripts/annotate-cosmic-calls.sh')
 
 	# Make a filter directory if it does not exist
         filter_directory = mutation_directory+"/"+"filter"
@@ -235,14 +238,14 @@ if (os.path.exists(sample_file)==True):
 		print "----------------------------------------------------------------------------"
 		print "Filtering somatic mutations through 1000g"
 		print "----------------------------------------------------------------------------"
-		os_call = ANNOVAR+" "+"-filter -dbtype 1000g2010nov_all"+" "+wrt_file" "+"-outfile"+" "+filter_directory+"/"+sample_name[i]+" "+ANNOVAR_DB+"/1000g"
+		os_call = ANNOVAR+" "+"-filter -dbtype 1000g2010nov_all"+" "+wrt_file+" "+"-outfile"+" "+filter_directory+"/"+sample_name[i]+" "+ANNOVAR_DB+"/1000g"
 		os.system(os_call)
 	
                 # Annotate 1000g filtered mutations
                 print "----------------------------------------------------------------------------"
                 print "Annotating 1000g filtered mutations"
                 print "----------------------------------------------------------------------------"
-                os_call = 1000g_ANNO+" "+filter_directory+" "+sample_name[i]
+                os_call = otg_ANNO+" "+filter_directory+" "+sample_name[i]
                 os.system(os_call)
 	
 		# Filter somatic mutations through ESP5400
@@ -263,7 +266,7 @@ if (os.path.exists(sample_file)==True):
 		print "----------------------------------------------------------------------------"
                 print "Filtering somatic filtered mutations through dbSNP132"
                 print "----------------------------------------------------------------------------"
-		os_call = ANNOVAR+" "+"-filter -dbtype snp132"+" "+wrt_file" "+"-outfile"+" "+filter_directory+"/"+sample_name[i]+" "+ANNOVAR_DB+"/dbSNP"
+		os_call = ANNOVAR+" "+"-filter -dbtype snp132"+" "+wrt_file+" "+"-outfile"+" "+filter_directory+"/"+sample_name[i]+" "+ANNOVAR_DB+"/dbSNP"
 		os.system(os_call)
 		
 		# Annotate dbSNP132 filtered mutations
