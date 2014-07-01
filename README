@@ -1,1 +1,5 @@
-When cloning this repo for the first time you must install the necessary tools. To do so create a 'tools' directory and place a copy of annovar, samtools, etc.
+# High throughput genomic sequencing pipeline
+## Installation
+When cloning this repo for the first time you must install the necessary tools.
+* Create a 'tools' directory in the root folder
+* Place a copy of annovar, samtools, etc.
