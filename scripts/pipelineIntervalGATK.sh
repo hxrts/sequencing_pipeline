@@ -20,15 +20,8 @@ SAM=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/samtools/samtools
 PIC=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/picard-tools-1.46/
 # VCF file reference
 VCF_FILE=/HOPP-Informatics/projects/MutPipeline/REF/00-All.vcf
-#VCF_FILE=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/reference/bundle/5777/hg19/hg19.vcf
 # Use old GATK for identifying target intervals
 GAT0=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/Sting/dist/GenomeAnalysisTK.jar
-
-#########################################################################################
-### Depricated - No longer used
-### REF=~/Documents/Resources/bundle/5777/hg18/Homo_sapiens_assembly18.fasta
-### VCF_FILE=~/Documents/Resources/bundle/5777/hg18/dbsnp_132.hg18.vcf
-#########################################################################################
 
 # ------------------------------------
 # Move to the working directory
