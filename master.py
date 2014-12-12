@@ -1,25 +1,30 @@
-# --------------------------------------------------------------------------------------------------------
-# This master script tha parses the sample information provided by the user and calls mutations and indels
+# --------------------------------------------------------------------------------------------------------#
+# This master script that parses the sample information provided by the user and calls mutations + indels
 # If there is a need to realign and recalibrate, it runs GATK realignment/recalibration scripts
-#
-# example file input: python master.py -s sample_info.txt -p path_file.txt -d test
-#
-# --------------------------------------------------------------------------------------------------------
-#
-TEST_RUN = 0 # 1=skip long steps, 0=production run
-#
-# --------------------------------------------------------------------------------------------------------
+# --------------------------------------------------------------------------------------------------------#
 
+#------------------------------------------------------------------#
+# Internal run arguments
+#------------------------------------------------------------------#
+
+TEST_RUN = 0 # 1=skip long steps, 0=production run
+
+#------------------------------------------------------------------#
 # Import relevant modules
+#------------------------------------------------------------------#
+
 import sys
 import csv
 import os
 import argparse
+from recurse import recurse
+
 #------------------------------------------------------------------#
 # Parser Info
 #------------------------------------------------------------------#
+
 parser = argparse.ArgumentParser(description='This program calls mutations and indels after indel realignment and recalibration. \
-					      It optionally does GATK realignment and recalibration.')
+					    					  It optionally does GATK realignment and recalibration.')
 parser.add_argument('-s','--sample-info', help='Sample information file [Required]', required=True)
 parser.add_argument('-d','--directory', help='Temproary directory name to create [Required]',required=True)
 parser.add_argument('-r','--recalibrate', help='Option to realign and recalibrate', required=False)
@@ -30,6 +35,7 @@ parser.add_argument('-ss','--somatic-sniper', help='Option to use only somatic s
 parser.add_argument('-si','--somatic-indels', help='Option to use only somatic indel detector',required=False)
 parser.add_argument('-ug','--unified-genotyper', help='Option to use only unified genotyper',required=False)
 parser.add_argument('-p','--path-file', help='Specifies path file',required=True)
+
 #------------------------------------------------------------------#
 # Get parser arguments and check validity
 #------------------------------------------------------------------#
@@ -63,6 +69,7 @@ if ((args['unified_genotyper'] != None) and (args['unified_genotyper'] != 'UNIFI
 # If none of the options for -mu, -ss, -si are given, then
 # execute all the callers by setting the flag to 1
 #-------------------------------------------------------------#
+
 if ((args['mutect'] == None) and (args['somatic_sniper'] == None) and (args['somatic_indels'] == None) and (args['unified_genotyper'] == None)):
 	mutect_flag = 1
 	somatic_sniper_flag = 1
@@ -70,10 +77,12 @@ if ((args['mutect'] == None) and (args['somatic_sniper'] == None) and (args['som
 	unified_genotyper_flag = 1
 if (args['only_variants'] == None):
 	only_variants_flag = 0
+
 #-------------------------------------------------------------#
 # Otherwise execute only the required caller by setting the 
 # callers flag as 1 and other callers flag as 0
 #-------------------------------------------------------------#
+
 if (args['mutect'] != None):
 	mutect_flag = 1
 	somatic_sniper_flag = 0
@@ -100,9 +109,11 @@ else:
 	bedfile_flag = 0
 if (args['only_variants'] != None):
 	only_variants_flag = 1
+
 #------------------------------------------------------------------#
 # If sample info path exists then read the file & execute pipeline
 #------------------------------------------------------------------# 
+
 if (os.path.exists(sample_file)==True):
 
 	# Open the input tab-delimited file
@@ -337,6 +348,7 @@ if (os.path.exists(sample_file)==True):
 			print "Calling somatic mutations using Somatic Sniper"
 			sys.stdout.flush()
 			os_call = SOMATIC_SNIPER_PATH+" "+tumor_recalibrated_directory+" "+normal_recalibrated_directory+" "+somatic_sniper_directory+" "+sample_name[i]
+			print os_call+"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 			os.system(os_call)
 		if (somatic_indel_flag == 1):
 			if (bedfile_flag == 1):
