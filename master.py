@@ -7,7 +7,7 @@
 # Internal run arguments
 #------------------------------------------------------------------#
 
-TEST_RUN = 0 # 1=skip long steps, 0=production run
+TEST_RUN = 1 # 1=skip long steps, 0=production run
 
 #------------------------------------------------------------------#
 # Import relevant modules
@@ -17,7 +17,7 @@ import sys
 import csv
 import os
 import argparse
-from recurse import recurse
+import recurse
 
 #------------------------------------------------------------------#
 # Parser Info
@@ -306,23 +306,24 @@ if (os.path.exists(sample_file)==True):
 				tumor_recalibrated_directory = directory + "/recalibrated_bams" + "/" + sample_name[i] + "_TU"
 				os.makedirs(normal_recalibrated_directory)
 				os.makedirs(tumor_recalibrated_directory)
-				# Copy the recalibrated bams to the required directory
-				print "Copying recalibrated normal file to the folder"
-				sys.stdout.flush()
-				os_call = "cp "+path[0]+"/"+normal_bam_file[i]+" "+normal_recalibrated_directory+"/"+"out.recal.quality.bam"
-				os.system(os_call)
-				print "Indexing the recalibrated normal bam file"
-				sys.stdout.flush()
-				os_call = SAM_INDEX_PATH+" "+normal_recalibrated_directory+"/"+"out.recal.quality.bam"
-				os.system(os_call)
-				print "Copying recalibrated tumor file to the folder"
-				sys.stdout.flush()
-				os_call = "cp "+path[0]+"/"+tumor_bam_file[i]+" "+tumor_recalibrated_directory+"/"+"out.recal.quality.bam"
-				os.system(os_call)
-				print "Indexing the recalibrated tumor bam file"
-				sys.stdout.flush()
-				os_call = SAM_INDEX_PATH+" "+tumor_recalibrated_directory+"/"+"out.recal.quality.bam"
-				os.system(os_call)
+				if TEST_RUN == 0:
+					# Copy the recalibrated bams to the required directory
+					print "Copying recalibrated normal file to the folder"
+					sys.stdout.flush()
+					os_call = "cp "+path[0]+"/"+normal_bam_file[i]+" "+normal_recalibrated_directory+"/"+"out.recal.quality.bam"
+					os.system(os_call)
+					print "Indexing the recalibrated normal bam file"
+					sys.stdout.flush()
+					os_call = SAM_INDEX_PATH+" "+normal_recalibrated_directory+"/"+"out.recal.quality.bam"
+					os.system(os_call)
+					print "Copying recalibrated tumor file to the folder"
+					sys.stdout.flush()
+					os_call = "cp "+path[0]+"/"+tumor_bam_file[i]+" "+tumor_recalibrated_directory+"/"+"out.recal.quality.bam"
+					os.system(os_call)
+					print "Indexing the recalibrated tumor bam file"
+					sys.stdout.flush()
+					os_call = SAM_INDEX_PATH+" "+tumor_recalibrated_directory+"/"+"out.recal.quality.bam"
+					os.system(os_call)
 		#-------------------------------------------------------------#
 		# Call somatic sniper and somatic indel detector and mutect
 		# depending on the flag. If none specified all the flags are
