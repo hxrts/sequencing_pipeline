@@ -1,3 +1,4 @@
+#!/bin/bash
 # This script will annotate the cosmic calls using annovar
 # $1 cosmic directory name
 # $2 sample name

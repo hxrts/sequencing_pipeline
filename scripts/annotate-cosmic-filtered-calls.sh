@@ -1,3 +1,4 @@
+#!/bin/bash
 # This script will annotate the cosmic, dbsnp, 1000g and ESP5400 filtered calls using annovar
 # $1 directory name
 # $2 sample name

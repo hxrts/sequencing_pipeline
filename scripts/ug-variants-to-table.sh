@@ -1,3 +1,4 @@
+#!/bin/bash
 # ------------------------------------------------------------------- #
 # This script parses unified genotyper vcf output and makes it 
 # into a tab-delimited file for annovar's filtering and annotation 

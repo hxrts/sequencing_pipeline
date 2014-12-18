@@ -1,3 +1,4 @@
+#!/bin/bash
 # echo Running Somatic Indel Detector on sample $3 using normal and tumor recalibrated .bam files >> /Applications/MAMP/htdocs/logs/somatic_indel_detector.log
 # java -Xmx8g -jar ~/Documents/tools/picard-tools-1.46/AddOrReplaceReadGroups.jar I=$1/out.recal.quality.bam O=$1-readgroup.bam SORT_ORDER=coordinate RGID=1 RGLB=mskcc RGPL=illumina RGPU=1 RGSM=$1 CREATE_INDEX=True VALIDATION_STRINGENCY=SILENT
 # java -Xmx8g -jar ~/Documents/tools/picard-tools-1.46/AddOrReplaceReadGroups.jar I=$2/out.recal.quality.bam O=$2-readgroup.bam SORT_ORDER=coordinate RGID=1 RGLB=mskcc RGPL=illumina RGPU=1 RGSM=$1 CREATE_INDEX=True VALIDATION_STRINGENCY=SILENT

@@ -1,3 +1,4 @@
+#!/bin/bash
 # ------------------------------------------------------------------- #
 # This script parses mutect txt output and makes it 
 # into a tab-delimited file for annovar's filtering and annotation 

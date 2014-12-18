@@ -1,3 +1,4 @@
+#!/bin/bash
 # Define the MuTect and other paths
 MUTECT_PATH_VER10=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/MuTect/version-1.0/muTect-1.0.27783-bin-BETA/muTect-1.0.27783.jar
 MUTECT_PATH_VER14=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/MuTect/version-1.4/muTect-1.1.4.jar
