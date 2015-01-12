@@ -1,7 +1,7 @@
 #!/bin/bash
-# Define the MuTect and other paths
-GATK=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/GenomeAnalysisTK-2.4-9-g532efad/GenomeAnalysisTK.jar
-REF=/home/sam/HOPP-Informatics/projects/MutPipeline/Homo_sapiens_assembly19.fasta
+
+echo "*** calling Unified Genotyper ***"
+source path_file.sh	# includes path to the reference genome $REF and the $GATK path
 
 /usr/lib/jvm/java-6-openjdk-amd64/jre/bin/java -Xmx2g -jar "$GATK" -T UnifiedGenotyper \
 								   -R "$REF" \

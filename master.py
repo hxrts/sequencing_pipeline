@@ -7,7 +7,7 @@
 # Internal run arguments
 #------------------------------------------------------------------#
 
-TEST_RUN = 1 # 1=skip long steps, 0=production run
+TEST_RUN = 0 # 1=skip long steps, 0=production run
 
 #------------------------------------------------------------------#
 # Import relevant modules

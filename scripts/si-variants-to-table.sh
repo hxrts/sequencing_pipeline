@@ -1,15 +1,20 @@
 #!/bin/bash
+
 # ------------------------------------------------------------------- #
 # This script parses somatic indel detector vcf output and makes it 
 # into a tab-delimited file for annovar's filtering and annotation 
 # ------------------------------------------------------------------- #
+
 # Input: 
 # $1 - somatic indel dectector path
 # $2 - somatic indel detector sample name
 
-# Path to the GATK program
-SNPEFF=/hopp-storage/HOPP-TOOLS/ANNOTATIONS/snpEff/SnpSift.jar
-ANNOVAR=/hopp-storage/HOPP-TOOLS/ANNOTATIONS/annovar/convert2annovar.pl
+# --------------------------------------#
+# Define the path to the required tools
+# --------------------------------------#
+
+echo "*** parsing somatic indel detector vcf output to tab delimited ***"
+source path_file.sh # path to the $SNPEFF, $ANNOVAR0
 
 # Make a temproary directory in $1 if it does not exists
 TMP_DIR=$1/tmp
@@ -28,7 +33,7 @@ WORK_DIR=$1/tmp
 cat $1/SI-$2.vcf | java -jar "$SNPEFF" filter "(exists SOMATIC)" > "$WORK_DIR"/$2-SOMATIC.vcf
 
 # Convert the variants in the vcf format to tab delimited format using annovar
-"$ANNOVAR" --format vcf4 "$WORK_DIR"/$2-SOMATIC.vcf --includeinfo --outfile "$WORK_DIR"/$2.tmp1
+"$ANNOVAR0" --format vcf4 "$WORK_DIR"/$2-SOMATIC.vcf --includeinfo --outfile "$WORK_DIR"/$2.tmp1
 
 # Retain only unique mutations. First cut chromosome and the position
 cut -f 1 "$WORK_DIR"/$2.tmp1 > "$WORK_DIR"/chr

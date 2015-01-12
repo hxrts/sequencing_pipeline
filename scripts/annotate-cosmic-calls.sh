@@ -1,11 +1,9 @@
 #!/bin/bash
-# This script will annotate the cosmic calls using annovar
 # $1 cosmic directory name
 # $2 sample name
 
-# Annovar annotation and database path
-ANNOVAR_PATH=/hopp-storage/HOPP-TOOLS/ANNOTATIONS/annovar/annotate_variation.pl 
-ANNOVAR_DB=/hopp-storage/HOPP-TOOLS/ANNOTATIONS/annovar/humandb/
+echo "*** Annotating cosmic calls using annovar ***"
+source path_file.sh	# includes path to $ANNOVAR_PATH and $ANNOVAR_DB
 
 # Extract only the columns that annovar accepts for annotating
 cut -f 3- $1/$2.hg19_cosmic64_dropped > $1/tmp

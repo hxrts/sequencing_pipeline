@@ -6,34 +6,25 @@ if [ $# -eq 0 ]; then
   exit 1;
 fi
 
-# --------------------------------------
+# --------------------------------------#
 # Define the path to the required tools
-# --------------------------------------
-# hg19 reference (uncomment if you want to use hg19)
-REF=/home/sam/HOPP-Informatics/projects/MutPipeline/Homo_sapiens_assembly19.fasta
-# GATK reference
-GAT=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/GenomeAnalysisTK-2.4-9-g532efad/GenomeAnalysisTK.jar
-# samtools reference
-SAM=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/samtools/samtools
-# Picard tools reference
-PIC=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/picard-tools-1.46/
-# VCF file reference
-VCF_FILE=/HOPP-Informatics/projects/MutPipeline/REF/00-All.vcf
-# Use old GATK for identifying target intervals
-GAT0=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/Sting/dist/GenomeAnalysisTK.jar
+# --------------------------------------#
 
-# ------------------------------------
+echo "*** executing GATK pipeline ***"
+source path_file.sh # path to the $REF, GAT, SAM, PIC, VCF_FILE, GAT0
+
+# ------------------------------#
 # Move to the working directory
-# ------------------------------------
+# ------------------------------#
 
 file_dir=$(echo $1 | sed 's|\(.*\)/.*|\1|')
 cd "$file_dir"
 
 file_name=$(basename $1)
 
-# ------------------------------------
+# ---------------------------------#
 # For each file apply the pipeline
-# ------------------------------------
+# ---------------------------------#
 
 for file in `ls -d "$file_dir"/"$file_name"` ; do
 
@@ -150,41 +141,10 @@ for file in `ls -d "$file_dir"/"$file_name"` ; do
   echo -------------------------------------------------------------- 
   $SAM view -b -q 1 out.recal.bam > out.recal.quality.bam
   $SAM index out.recal.quality.bam
+
   # -------------------------------------------
   # Pipeline ends here
   # -------------------------------------------
-  # echo ====================== Cleaning up ============================
-  # echo ---------------------------------------------------------------
-  # echo Creating relevant directories 
-  # echo --------------------------------------------------------------- 
-  # mkdir ../recalibrated-"$file"
-
-  ###################################################################
-  ### Depricated - No longer used
-  ###################################################################
-  ### mkdir analysis-"$file"-folder/original
-  ### mkdir analysis-"$file"-folder/pre-processed
-  ### mkdir analysis-"$file"-folder/indel-realignment
-  ### mkdir analysis-"$file"-folder/recalibrated
-  ###################################################################
-
-  # echo ---------------------------------------------------------------
-  # echo Moving folders to appropriate places 
-  # echo ---------------------------------------------------------------
-
-  ###################################################################
-  ### Depricated - No longer used
-  ###################################################################
-  ### mv "$file" analysis-"$file"-folder/original
-  ### mv "$file".bai analysis-"$file"-folder/original    
-  ### mv out.bam out.sorted.bam out.sorted.bam.bai \
-  ###    out.sorted.marked.bam out.sorted.marked.bam.bai \
-  ###    my.duplication.metrics analysis-"$file"-folder/pre-processed
-  ### mv out.intervals out.realigned.bam out.realigned.bai \
-  ###    analysis-"$file"-folder/indel-realignment
-  ###################################################################
-
-  # mv recal_data.csv out.recal.quality.bam out.recal.quality.bam.bai ../recalibrated-"$file"
 
   echo ----------------------------------------------------------------
   echo Removing unwanted intermediary files

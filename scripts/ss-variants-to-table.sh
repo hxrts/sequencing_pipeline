@@ -1,15 +1,20 @@
 #!/bin/bash
+
 # ------------------------------------------------------------------- #
 # This script parses somatic sniper's vcf output and makes it 
 # into a tab-delimited file for annovar's filtering and annotation 
 # ------------------------------------------------------------------- #
+
 # Input: 
 # $1 - somatic sniper path
 # $2 - somatic sniper sample name
 
-# Path to the GATK program
-GATK=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/GenomeAnalysisTK-2.4-9-g532efad/GenomeAnalysisTK.jar
-REF=/home/sam/HOPP-Informatics/projects/MutPipeline/Homo_sapiens_assembly19.fasta
+# --------------------------------------#
+# Define the path to the required tools
+# --------------------------------------#
+
+echo "*** parsing somatic sniper's vcf output to tab delimited ***"
+source path_file.sh # path to $GATK, $REF
 
 # Make a temproary directory in $1 if it does not exists
 TMP_DIR=$1/tmp

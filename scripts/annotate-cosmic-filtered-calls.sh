@@ -1,11 +1,9 @@
 #!/bin/bash
-# This script will annotate the cosmic, dbsnp, 1000g and ESP5400 filtered calls using annovar
 # $1 directory name
 # $2 sample name
 
-# Annovar annotation and database path
-ANNOVAR_PATH=/hopp-storage/HOPP-TOOLS/ANNOTATIONS/annovar/annotate_variation.pl 
-ANNOVAR_DB=/hopp-storage/HOPP-TOOLS/ANNOTATIONS/annovar/humandb/
+echo "*** Annotating cosmic, dbsnp, 1000g and ESP5400 filtered calls using annovar ***"
+source path_file.sh	# includes path to $ANNOVAR_PATH and $ANNOVAR_DB
 
 # Annotate dbsnp filtered calls using refseq
 "$ANNOVAR_PATH" -buildver hg19 -dbtype gene $1/$2.hg19_snp132_filtered "$ANNOVAR_DB"
