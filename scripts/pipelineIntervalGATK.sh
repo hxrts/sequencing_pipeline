@@ -11,7 +11,7 @@ fi
 # --------------------------------------#
 
 echo "*** executing GATK pipeline with intervals ***"
-source path_file.sh # path to the $REF, GAT, SAM, PIC, VCF_FILE, GAT0
+source path_file.sh # path to the $REF, $GAT, $SAM, $PIC, $VCF_FILE, $GAT0
 
 # ------------------------------#
 # Move to the working directory
@@ -142,41 +142,10 @@ for file in `ls -d "$file_dir"/"$file_name"` ; do
   echo -------------------------------------------------------------- 
   $SAM view -b -q 1 out.recal.bam > out.recal.quality.bam
   $SAM index out.recal.quality.bam
-  # -------------------------------------------
+
+  #-------------------------------------------#
   # Pipeline ends here
-  # -------------------------------------------
-  # echo ====================== Cleaning up ============================
-  # echo ---------------------------------------------------------------
-  # echo Creating relevant directories 
-  # echo --------------------------------------------------------------- 
-  # mkdir ../recalibrated-"$file"
-
-  ###################################################################
-  ### Depricated - No longer used
-  ###################################################################
-  ### mkdir analysis-"$file"-folder/original
-  ### mkdir analysis-"$file"-folder/pre-processed
-  ### mkdir analysis-"$file"-folder/indel-realignment
-  ### mkdir analysis-"$file"-folder/recalibrated
-  ###################################################################
-
-  # echo ---------------------------------------------------------------
-  # echo Moving folders to appropriate places 
-  # echo ---------------------------------------------------------------
-
-  ###################################################################
-  ### Depricated - No longer used
-  ###################################################################
-  ### mv "$file" analysis-"$file"-folder/original
-  ### mv "$file".bai analysis-"$file"-folder/original    
-  ### mv out.bam out.sorted.bam out.sorted.bam.bai \
-  ###    out.sorted.marked.bam out.sorted.marked.bam.bai \
-  ###    my.duplication.metrics analysis-"$file"-folder/pre-processed
-  ### mv out.intervals out.realigned.bam out.realigned.bai \
-  ###    analysis-"$file"-folder/indel-realignment
-  ###################################################################
-
-  # mv recal_data.csv out.recal.quality.bam out.recal.quality.bam.bai ../recalibrated-"$file"
+  #-------------------------------------------#
 
   echo ----------------------------------------------------------------
   echo Removing unwanted intermediary files

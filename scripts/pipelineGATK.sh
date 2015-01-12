@@ -11,7 +11,7 @@ fi
 # --------------------------------------#
 
 echo "*** executing GATK pipeline ***"
-source path_file.sh # path to the $REF, GAT, SAM, PIC, VCF_FILE, GAT0
+source path_file.sh # path to the $REF, $GAT, $SAM, $PIC, $VCF_FILE, $GAT0
 
 # ------------------------------#
 # Move to the working directory
@@ -142,9 +142,9 @@ for file in `ls -d "$file_dir"/"$file_name"` ; do
   $SAM view -b -q 1 out.recal.bam > out.recal.quality.bam
   $SAM index out.recal.quality.bam
 
-  # -------------------------------------------
+  #-------------------------------------------#
   # Pipeline ends here
-  # -------------------------------------------
+  #-------------------------------------------#
 
   echo ----------------------------------------------------------------
   echo Removing unwanted intermediary files
