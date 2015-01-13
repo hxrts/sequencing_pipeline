@@ -110,6 +110,21 @@ else:
 if (args['only_variants'] != None):
 	only_variants_flag = 1
 
+#-------------------------------------------------------------#
+# Define paths for the required programs
+#-------------------------------------------------------------#
+
+GATK_PATH = exdir + '/scripts/pipelineGATK.sh'																				# GATK pipeline path
+GATK_INTERVAL_PATH = exdir + '/scripts/pipelineIntervalGATK.sh'																# GATK interval script path
+SAM_INDEX_PATH = exdir + '/home/sam/HOPP-Informatics/projects/sequencing_pipeline/tools/samtools-0.1.19/samtools index'		# samtools path	
+SOMATIC_SNIPER_PATH = exdir + '/scripts/call-somatic-sniper.sh'																# somatic sniper path
+SOMATIC_INDEL_PATH = exdir + '/scripts/call-indels.sh'																		# somatic indel_detector path
+SOMATIC_INDEL_INTERVAL_PATH = exdir + '/scripts/call-indels-with-intervals.sh'												# somatic indel path with intervals
+MUTECT_PATH = exdir + '/scripts/call-mutect.sh'																				# mutect path
+MUTECT_INTERVAL_PATH = exdir + '/scripts/call-mutect-with-intervals.sh'														# mutect path with intervals
+UNIFIED_GENOTYPER_PATH = exdir + '/scripts/call-genotyper.sh'																# unified genotyper path
+UNIFIED_GENOTYPER_INTERVAL_PATH = exdir + '/scripts/call-genotyper-with-intervals.sh'										# unified genotyper with intervals
+
 #------------------------------------------------------------------#
 # If sample info path exists then read the file & execute pipeline
 #------------------------------------------------------------------# 
@@ -181,32 +196,10 @@ if (os.path.exists(sample_file)==True):
 		if (unified_genotyper_flag == 1):
 			os.makedirs(unified_genotyper_directory)
 
-	#-------------------------------------------------------------#
-	# Define paths for the required programs
-	#-------------------------------------------------------------#
-	# GATK pipeline path
-	GATK_PATH = exdir + '/scripts/pipelineGATK.sh'
-	# GATK interval script path
-	GATK_INTERVAL_PATH = exdir + '/scripts/pipelineIntervalGATK.sh'
-	# samtools path
-	SAM_INDEX_PATH = exdir + '/tools/samtools-0.1.19/samtools index'
-	# somatic sniper path
-	SOMATIC_SNIPER_PATH = exdir + '/scripts/call-somatic-sniper.sh'
-	# somatic indel_detector path
-	SOMATIC_INDEL_PATH = exdir + '/scripts/call-indels.sh'
-	# somatic indel path with intervals
-	SOMATIC_INDEL_INTERVAL_PATH = exdir + '/scripts/call-indels-with-intervals.sh'
-	# mutect path
-	MUTECT_PATH = exdir + '/scripts/call-mutect.sh'
-	# mutect path with intervals
-	MUTECT_INTERVAL_PATH = exdir + '/scripts/call-mutect-with-intervals.sh'
-	# unified genotyper path
-	UNIFIED_GENOTYPER_PATH = exdir + '/scripts/call-genotyper.sh'
-	# unified genotyper with intervals
-	UNIFIED_GENOTYPER_INTERVAL_PATH = exdir + '/scripts/call-genotyper-with-intervals.sh'
-	#-------------------------------------------------------------#
-
+	#---------------------------------------------------------------------#
 	# For each sample specified in the sample info file do the processing
+	#---------------------------------------------------------------------#
+	
 	for i in range(len(sample_name)):
 		
 			# Status information
@@ -281,9 +274,11 @@ if (os.path.exists(sample_file)==True):
 				os.system(os_call)
 				os_call = "cp "+tumor_directory+"/"+"out.recal.quality.bam.bai"+" "+tumor_recalibrated_directory+"/"
 				os.system(os_call)
+
 				#-------------------------------------------------------------#
 				# Copy the recalibrated files to the original path
 				#-------------------------------------------------------------#
+
 				sys.stdout.flush()
 				if TEST_RUN == 0:
 					print "Copying recalibrated normal bam files to HOPP storage server"
@@ -324,6 +319,7 @@ if (os.path.exists(sample_file)==True):
 				sys.stdout.flush()
 				os_call = SAM_INDEX_PATH+" "+tumor_recalibrated_directory+"/"+"out.recal.quality.bam"
 				os.system(os_call)
+
 		#-------------------------------------------------------------#
 		# Call somatic sniper and somatic indel detector and mutect
 		# depending on the flag. If none specified all the flags are

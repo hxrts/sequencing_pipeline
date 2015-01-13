@@ -2,7 +2,7 @@
 # GLOBAL
 #--------#
 
-REF=/home/sam/HOPP-Informatics/projects/sequencing_pipeline/refs/Homo_sapiens_assembly19.fasta
+REF=/home/sam/HOPP-Informatics/projects/sequencingPipeline/refs/Homo_sapiens_assembly19.fasta
 
 #---------#
 # ANNOVAR
@@ -20,7 +20,7 @@ ANNOVAR_DB=/hopp-storage/HOPP-TOOLS/ANNOTATIONS/annovar-may-2013/annovar/humandb
 
 GATK=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/GenomeAnalysisTK-2.4-9-g532efad/GenomeAnalysisTK.jar
 GAT1=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/Somatic-Indel-Detector/GATK/dist/GenomeAnalysisTK.jar
-GAT0=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/Sting/dist/GenomeAnalysisTK.jar	# Use old GATK for identifying target intervals
+GAT0=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/Sting/dist/GenomeAnalysisTK.jar								# Use old GATK for identifying target intervals
 
 #--------#
 # MUTECT
@@ -39,14 +39,14 @@ DBSNP=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/MuTect/version-1.0/dbsnp_132
 # SAMTOOLS
 #----------#
 
-SAM=/home/sam/HOPP-Informatics/projects/sequencing_pipeline/tools/samtools-0.1.19/samtools
+SAM=/home/sam/HOPP-Informatics/projects/sequencingPipeline/tools/samtools-0.1.19/samtools
 
 #--------#
 # PICARD
 #--------#
 
 PIC=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/picard-tools-1.46/
-VCF_FILE=/home/sam/HOPP-Informatics/projects/sequencing_pipeline/refs/00-All.vcf
+VCF_FILE=/home/sam/HOPP-Informatics/projects/sequencingPipeline/refs/00-All.vcf
 
 #--------#
 # SNPEFF
@@ -62,7 +62,5 @@ SNPEFF=/hopp-storage/HOPP-TOOLS/ANNOTATIONS/snpEff/SnpSift.jar
 # ESP_ANNO=/hopp-storage/HOPP-TOOLS/PIPELINES/MutPipelines/scripts/annotate-ESP-calls.sh <------ missing
 # dbSNP_ANNO=/hopp-storage/HOPP-TOOLS/PIPELINES/MutPipelines/scripts/annotate-dbSNP-calls.sh <------ missing
 # COSMIC_ANNO=/HOPP-Informatics/projects/sequencing_pipeline/scripts/annotate-cosmic-calls.sh
-
-
 
 
