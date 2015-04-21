@@ -1,5 +1,5 @@
 # --------------------------------------------------------------------------------------------------------#
-# This master script that parses the sample information provided by the user and calls mutations + indels
+# This primary script that parses the sample information provided by the user and calls mutations + indels
 # If there is a need to realign and recalibrate, it runs GATK realignment/recalibration scripts
 # --------------------------------------------------------------------------------------------------------#
 
@@ -17,7 +17,6 @@ import sys
 import csv
 import os
 import argparse
-import recurse
 
 #------------------------------------------------------------------#
 # Parser Info
@@ -116,7 +115,7 @@ if (args['only_variants'] != None):
 
 GATK_PATH = exdir + '/scripts/pipelineGATK.sh'																				# GATK pipeline path
 GATK_INTERVAL_PATH = exdir + '/scripts/pipelineIntervalGATK.sh'																# GATK interval script path
-SAM_INDEX_PATH = exdir + '/home/sam/HOPP-Informatics/projects/sequencing_pipeline/tools/samtools-0.1.19/samtools index'		# samtools path	
+SAM_INDEX_PATH = exdir + '/home/sam/tools/samtools-1.1/samtools index'		# samtools path	
 SOMATIC_SNIPER_PATH = exdir + '/scripts/call-somatic-sniper.sh'																# somatic sniper path
 SOMATIC_INDEL_PATH = exdir + '/scripts/call-indels.sh'																		# somatic indel_detector path
 SOMATIC_INDEL_INTERVAL_PATH = exdir + '/scripts/call-indels-with-intervals.sh'												# somatic indel path with intervals
@@ -345,7 +344,6 @@ if (os.path.exists(sample_file)==True):
 			print "Calling somatic mutations using Somatic Sniper"
 			sys.stdout.flush()
 			os_call = SOMATIC_SNIPER_PATH+" "+tumor_recalibrated_directory+" "+normal_recalibrated_directory+" "+somatic_sniper_directory+" "+sample_name[i]
-			print os_call+"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"
 			os.system(os_call)
 		if (somatic_indel_flag == 1):
 			if (bedfile_flag == 1):

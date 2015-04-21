@@ -2,7 +2,8 @@
 # GLOBAL
 #--------#
 
-REF=/home/sam/HOPP-Informatics/projects/sequencingPipeline/refs/Homo_sapiens_assembly19.fasta
+#REF=/home/sam/HOPP-Informatics/projects/sequencingPipeline/refs/Homo_sapiens_assembly19.fasta
+REF=/home/sam/HOPP-Informatics/projects/sequencingPipeline/refs/GRCh37-lite.fa
 
 #---------#
 # ANNOVAR
@@ -18,9 +19,14 @@ ANNOVAR_DB=/hopp-storage/HOPP-TOOLS/ANNOTATIONS/annovar-may-2013/annovar/humandb
 # GATK
 #------#
 
-GATK=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/GenomeAnalysisTK-2.4-9-g532efad/GenomeAnalysisTK.jar
-GAT1=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/Somatic-Indel-Detector/GATK/dist/GenomeAnalysisTK.jar
-GAT0=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/Sting/dist/GenomeAnalysisTK.jar								# Use old GATK for identifying target intervals
+GATK=/home/sam/tools/GenomeAnalysisTK-3.3-0/GenomeAnalysisTK.jar
+#GATK_IndelGeno=/home/sam/tools/GenomeAnalysisTK-3.3-0/IndelGenotyper.36.3336-GenomeAnalysisTK.jar
+
+#GAT1=/home/sam/tools/GenomeAnalysisTK-3.3-0/GenomeAnalysisTK.jar
+#GAT0=/home/sam/tools/GenomeAnalysisTK-3.3-0/GenomeAnalysisTK.jar
+#GATK=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/GenomeAnalysisTK-2.4-9-g532efad/GenomeAnalysisTK.jar
+#GAT1=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/Somatic-Indel-Detector/GATK/dist/GenomeAnalysisTK.jar
+#GAT0=/hopp-storage/HOPP-TOOLS/PIPELINES/GATKBundle/Sting/dist/GenomeAnalysisTK.jar								# Use old GATK for identifying target intervals
 
 #--------#
 # MUTECT
@@ -61,6 +67,6 @@ SNPEFF=/hopp-storage/HOPP-TOOLS/ANNOTATIONS/snpEff/SnpSift.jar
 # 1000g_ANNO=/hopp-storage/HOPP-TOOLS/PIPELINES/MutPipelines/scripts/annotate-100g-calls.sh <------ missing
 # ESP_ANNO=/hopp-storage/HOPP-TOOLS/PIPELINES/MutPipelines/scripts/annotate-ESP-calls.sh <------ missing
 # dbSNP_ANNO=/hopp-storage/HOPP-TOOLS/PIPELINES/MutPipelines/scripts/annotate-dbSNP-calls.sh <------ missing
-# COSMIC_ANNO=/HOPP-Informatics/projects/sequencing_pipeline/scripts/annotate-cosmic-calls.sh
+# COSMIC_ANNO=/HOPP-Informatics/projects/sequencingPipeline/scripts/annotate-cosmic-calls.sh
 
 

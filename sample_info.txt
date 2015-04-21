@@ -1,3 +1,3 @@
-BAMPath	/home/sam/HOPP-Informatics/projects/sequencing_pipeline/bams
-LOCPath	/home/sam/HOPP-Informatics/projects/sequencing_pipeline/loc
-s_GA_1	s_GA_NL1__1.bam	s_GA_T1__1.bam		
+BAMPath	/home/sam/HOPP-Informatics/projects/sequencingPipeline/bams
+LOCPath	/home/sam/HOPP-Informatics/projects/sequencingPipeline/loc
+AK-3451	TCGA-AK-3451-10A-01D-1251-10_Illumina.bam	TCGA-AK-3451-01A-02D-1251-10_Illumina.bam		
