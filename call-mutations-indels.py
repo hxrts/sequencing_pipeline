@@ -4,12 +4,6 @@
 # --------------------------------------------------------------------------------------------------------#
 
 #------------------------------------------------------------------#
-# Internal run arguments
-#------------------------------------------------------------------#
-
-TEST_RUN = 0 # 1=skip long steps, 0=production run
-
-#------------------------------------------------------------------#
 # Import relevant modules
 #------------------------------------------------------------------#
 
@@ -113,9 +107,9 @@ if (args['only_variants'] != None):
 # Define paths for the required programs
 #-------------------------------------------------------------#
 
+SAM_INDEX_PATH = exdir + '/home/sam/tools/samtools-1.1/samtools index'		# samtools path	
 GATK_PATH = exdir + '/scripts/pipelineGATK.sh'																				# GATK pipeline path
 GATK_INTERVAL_PATH = exdir + '/scripts/pipelineIntervalGATK.sh'																# GATK interval script path
-SAM_INDEX_PATH = exdir + '/home/sam/tools/samtools-1.1/samtools index'		# samtools path	
 SOMATIC_SNIPER_PATH = exdir + '/scripts/call-somatic-sniper.sh'																# somatic sniper path
 SOMATIC_INDEL_PATH = exdir + '/scripts/call-indels.sh'																		# somatic indel_detector path
 SOMATIC_INDEL_INTERVAL_PATH = exdir + '/scripts/call-indels-with-intervals.sh'												# somatic indel path with intervals
@@ -218,18 +212,12 @@ if (os.path.exists(sample_file)==True):
 				os.makedirs(tumor_directory)
 				sys.stdout.flush()
 				os_call = "cp "+path[0]+"/"+normal_bam_file[i]+" "+normal_directory
-				if TEST_RUN == 0:
-					os.system(os_call)
-					print "Copying normal bam file to the local folder"
-				else:
-					print "TEST RUN | Skipping Copy of normal bam file to the local folder"
+				os.system(os_call)
+				print "Copying normal bam file to the local folder"
 				sys.stdout.flush()
 				os_call = "cp "+path[0]+"/"+tumor_bam_file[i]+" "+tumor_directory
-				if TEST_RUN == 0:
-					os.system(os_call)
-					print "Copying tumor bam file to the local folder"
-				else:
-					print "TEST RUN | Skipping Copy of tumor bam file to the local folder"
+				os.system(os_call)
+				print "Copying tumor bam file to the local folder"
 		
 				# Call GATK pipeline to the tumor and normal files locally stored
 				if (bedfile_flag == 1):
@@ -257,17 +245,11 @@ if (os.path.exists(sample_file)==True):
 				# Copy the recalibrated bams to the required directory
 				sys.stdout.flush()
 				os_call = "cp "+normal_directory+"/"+"out.recal.quality.bam"+" "+normal_recalibrated_directory+"/"
-				if TEST_RUN == 0:
-					print "Copying recalibrated normal file to the recalibrated folder"
-					os.system(os_call)
-				else:
-					print "TEST RUN | Skipping copy of recalibrated normal file to the recalibrated folder"
+				print "Copying recalibrated normal file to the recalibrated folder"
+				os.system(os_call)
 				os_call = "cp "+normal_directory+"/"+"out.recal.quality.bam.bai"+" "+normal_recalibrated_directory+"/"
-				if TEST_RUN == 0:
-					print "Copying recalibrated tumor file to the recalibrated folder"
-					os.system(os_call)
-				else:
-					print "TEST RUN | Skipping copy of recalibrated tumor file to the recalibrated folder"
+				print "Copying recalibrated tumor file to the recalibrated folder"
+				os.system(os_call)
 				sys.stdout.flush()
 				os_call = "cp "+tumor_directory+"/"+"out.recal.quality.bam"+" "+tumor_recalibrated_directory+"/"
 				os.system(os_call)
@@ -279,16 +261,12 @@ if (os.path.exists(sample_file)==True):
 				#-------------------------------------------------------------#
 
 				sys.stdout.flush()
-				if TEST_RUN == 0:
-					print "Copying recalibrated normal bam files to HOPP storage server"
-					os_call = "cp"+" "+normal_recalibrated_directory+"/out.recal.quality.bam"+" "+path[0]+"/"+"recalibrated-"+normal_bam_file[i]
-					os.system(os_call)
-					os_call = "cp"+" "+normal_recalibrated_directory+"/out.recal.quality.bam.bai"+" "+path[0]+"/"+"recalibrated-"+normal_bam_file[i]+".bai"
-					os.system(os_call)
-					print "Copying recalibrated tumor bam files to HOPP storage server"
-				else:
-					print "TEST RUN | Skipping copy of recalibrated normal bam files to HOPP storage server"
-					print "TEST RUN | Skipping copy of recalibrated tumor bam files to HOPP storage server"
+				print "Copying recalibrated normal bam files to HOPP storage server"
+				os_call = "cp"+" "+normal_recalibrated_directory+"/out.recal.quality.bam"+" "+path[0]+"/"+"recalibrated-"+normal_bam_file[i]
+				os.system(os_call)
+				os_call = "cp"+" "+normal_recalibrated_directory+"/out.recal.quality.bam.bai"+" "+path[0]+"/"+"recalibrated-"+normal_bam_file[i]+".bai"
+				os.system(os_call)
+				print "Copying recalibrated tumor bam files to HOPP storage server"
 				sys.stdout.flush()
 				os_call = "cp"+" "+tumor_recalibrated_directory+"/out.recal.quality.bam"+" "+path[0]+"/"+"recalibrated-"+tumor_bam_file[i]
 				os.system(os_call)
@@ -300,7 +278,6 @@ if (os.path.exists(sample_file)==True):
 				tumor_recalibrated_directory = directory + "/recalibrated_bams" + "/" + sample_name[i] + "_TU"
 				os.makedirs(normal_recalibrated_directory)
 				os.makedirs(tumor_recalibrated_directory)
-				#if TEST_RUN == 0:
 				# Copy the recalibrated bams to the required directory
 				print "Copying recalibrated normal file to the folder"
 				sys.stdout.flush()
@@ -363,14 +340,14 @@ if (os.path.exists(sample_file)==True):
 		if (mutect_flag == 1):
 			if (bedfile_flag == 1):
 				print "-------------------------------------------------------------"
-				print "Calling MuTect with intervals list"
+				print "Calling muTect with intervals list"
 				print "-------------------------------------------------------------"
 				sys.stdout.flush()
 				os_call = MUTECT_INTERVAL_PATH+" "+tumor_recalibrated_directory+" "+normal_recalibrated_directory+" "+mutect_directory+" "+sample_name[i]+" "+bedfile_name
 				os.system(os_call)
 			else:
 				print "-------------------------------------------------------------"
-				print "Calling MuTect..."
+				print "Calling muTect"
 				print "-------------------------------------------------------------"
 				sys.stdout.flush()
 				os_call = MUTECT_PATH+" "+tumor_recalibrated_directory+" "+normal_recalibrated_directory+" "+mutect_directory+" "+sample_name[i]

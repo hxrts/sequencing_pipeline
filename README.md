@@ -5,9 +5,9 @@ When cloning this repo for the first time you must install the necessary tools.
 2. Place a copy of annovar, samtools, etc.
 
 ### Executing the script
-production run: `python call-mutations-indels.py -s sample_info.txt -p path_file.txt -d test -b test`
+production run: `python call-mutations-indels.py -s sample_info.txt -p path_file.txt -d outputdir [-b intervals.maf]`
 
-debug run: `python -i call-mutations-indels.py -s sample_info.txt -p path_file.txt -d test -b test`
+debug run: `python -i call-mutations-indels.py -s sample_info.txt -p path_file.txt -d outputdir [-b intervals.maf]`
 
 This pipeline is currently installed on the hopp-cli server and must be executed from /home/sam/HOPP-Informatics/projects/sequencingPipeline.
 

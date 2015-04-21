@@ -3,7 +3,7 @@
 echo "*** calling indels ***"
 source path_file.sh	# path to the GATK (somatic indel detector) and reference genome
 
-java -Xmx8g -jar "$GAT1" -R "$REF" -T SomaticIndelDetector -mnr 50000  \
+"$JAVA" -Xmx8g -jar "$SomaticIndelDetector" -R "$REF" -T SomaticIndelDetector -mnr 50000  \
 							   -minConsensusFraction 0.7 \
 							   -minCoverage 6 \
 							   -minNormalCoverage 4 \

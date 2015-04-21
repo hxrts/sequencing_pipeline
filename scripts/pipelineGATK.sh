@@ -11,7 +11,7 @@ fi
 # --------------------------------------#
 
 echo "*** executing GATK pipeline ***"
-source path_file.sh # path to the $REF, $GAT, $SAM, $PIC, $VCF_FILE, $GAT0
+source path_file.sh # path to the $REF, $GAT, $SAM, $PIC, $VCF_ALL, $GAT0
 
 # ------------------------------#
 # Move to the working directory
@@ -77,7 +77,7 @@ for file in `ls -d "$file_dir"/"$file_name"` ; do
   java -Xmx15g -jar $GAT0 -T RealignerTargetCreator \
                           -R $REF \
                           -I out.sorted.marked.bam \
-                          -B:dbsnp,VCF $VCF_FILE \
+                          -B:dbsnp,VCF $VCF_ALL \
                           -o out.intervals 
   echo --------------------------------------------------------------
   echo Add or Replace read groups using picard
@@ -120,7 +120,7 @@ for file in `ls -d "$file_dir"/"$file_name"` ; do
                           -cov DinucCovariate \
                           -R $REF \
                           -I out.realigned.bam \
-                          -B:dbsnp,VCF $VCF_FILE \
+                          -B:dbsnp,VCF $VCF_ALL \
                           -recalFile recal_data.csv \
 			  -dP illumina \
 			  -dRG xxxxx \

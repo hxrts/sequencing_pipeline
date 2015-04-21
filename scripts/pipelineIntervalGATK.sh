@@ -11,7 +11,7 @@ fi
 # --------------------------------------#
 
 echo "*** executing GATK pipeline with intervals ***"
-source path_file.sh # path to the $REF, $GAT, $SAM, $PIC, $VCF_FILE, $GAT0
+source path_file.sh # path to the $REF, $GAT, $SAM, $PIC, $VCFALL, $GAT0
 
 # ------------------------------#
 # Move to the working directory
@@ -92,7 +92,7 @@ for file in `ls -d "$file_dir"/"$file_name"` ; do
                           -R $REF \
                           -I out.sorted.marked.readgroup.bam \
 			  -L $2 \
-                          -B:dbsnp,VCF $VCF_FILE \
+                          -B:dbsnp,VCF $VCFALL \
                           -o out.intervals  
   
   echo --------------------------------------------------------------
@@ -120,7 +120,7 @@ for file in `ls -d "$file_dir"/"$file_name"` ; do
                           -R $REF \
 			  -L $2 \
                           -I out.realigned.bam \
-                          -B:dbsnp,VCF $VCF_FILE \
+                          -B:dbsnp,VCF $VCFALL \
                           -recalFile recal_data.csv \
 			  -dP illumina \
 			  -dRG xxxxx \
