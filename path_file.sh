@@ -2,8 +2,8 @@
 # REFERENCE FILES
 #################
 
-#REF=/home/sam/HOPP-Informatics/projects/sequencingPipeline/refs/Homo_sapiens_assembly19.fasta
-REF=/home/sam/HOPP-Informatics/projects/sequencingPipeline/refs/GRCh37-lite.fa
+REF=/home/sam/HOPP-Informatics/projects/sequencingPipeline/refs/Homo_sapiens_assembly19.fasta
+#REF=/home/sam/HOPP-Informatics/projects/sequencingPipeline/refs/GRCh37-lite.fa
 COSMICVCF=/home/sam/HOPP-Informatics/projects/sequencingPipeline/refs/hg19_cosmic_v54_120711.vcf
 DBSNPVCF=/home/sam/HOPP-Informatics/projects/sequencingPipeline/refs/dbsnp_132_b37.leftAligned.vcf
 VCF_ALL=/home/sam/HOPP-Informatics/projects/sequencingPipeline/refs/00-All.vcf
@@ -46,7 +46,7 @@ MUTECT=/home/sam/tools/muTect-source-4.21.2015/mutect/target/mutect-1.1.7.jar
 # SAMTOOLS
 ##########
 
-SAM=/home/sam/HOPP-Informatics/projects/sequencingPipeline/tools/samtools-0.1.19/samtools
+SAM=/home/sam/tools/samtools-1.1/samtools
 
 ########
 # PICARD

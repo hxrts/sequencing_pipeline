@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # ------------------------------------------------------------------- #
-# This script parses somatic indel detector vcf output and makes it 
-# into a tab-delimited file for annovar's filtering and annotation 
+# This script parses somatic indel detector vcf output and makes it
+# into a tab-delimited file for annovar's filtering and annotation
 # ------------------------------------------------------------------- #
 
-# Input: 
+# Input:
 # $1 - somatic indel dectector path
 # $2 - somatic indel detector sample name
 

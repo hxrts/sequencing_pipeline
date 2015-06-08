@@ -1,11 +1,11 @@
 #!/bin/bash
 
 # ------------------------------------------------------------------- #
-# This script parses unified genotyper vcf output and makes it 
-# into a tab-delimited file for annovar's filtering and annotation 
+# This script parses unified genotyper vcf output and makes it
+# into a tab-delimited file for annovar's filtering and annotation
 # ------------------------------------------------------------------- #
 
-# Input: 
+# Input:
 # $1 - unified genotyper path
 # $2 - unified genotyper sample name
 
@@ -22,7 +22,7 @@ TMP_DIR=$1/tmp
 if [ -d "$TMP_DIR" ]; then
 	rm -rf "$TMP_DIR"
 	mkdir $1/tmp
-else 
+else
 	mkdir $1/tmp
 fi
 

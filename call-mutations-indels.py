@@ -107,7 +107,7 @@ if (args['only_variants'] != None):
 # Define paths for the required programs
 #-------------------------------------------------------------#
 
-SAM_INDEX_PATH = exdir + '/home/sam/tools/samtools-1.1/samtools index'		# samtools path	
+SAM_INDEX_PATH = '/home/sam/tools/samtools-1.1/samtools index'		# samtools path	
 GATK_PATH = exdir + '/scripts/pipelineGATK.sh'																				# GATK pipeline path
 GATK_INTERVAL_PATH = exdir + '/scripts/pipelineIntervalGATK.sh'																# GATK interval script path
 SOMATIC_SNIPER_PATH = exdir + '/scripts/call-somatic-sniper.sh'																# somatic sniper path
@@ -160,7 +160,8 @@ if (os.path.exists(sample_file)==True):
 		else:
 			os_call = "rm -rf "+ directory
 			os.system(os_call)
-			os.makedirs(directory)
+			os_call = "mkdir -p "+ directory
+			os.system(os_call)
 
 	# Check if the recalibration flag is on and in that case make a folder for storing raw bams
 	if (only_variants_flag == 0):
@@ -168,7 +169,7 @@ if (os.path.exists(sample_file)==True):
 			os.makedirs(directory + "/raw_bams")
 			os.makedirs(directory + "/recalibrated_bams")
 		else:
-			os.makedirs(directory + "/recalibrated_bams")
+			os.makedirs(directory + "/nonrecalibrated_bams")
 	
 	# Make directories for results
 	somatic_sniper_directory = path[1] + "/somatic_sniper"
@@ -238,22 +239,22 @@ if (os.path.exists(sample_file)==True):
 					os.system(os_call)
 
 				# Make directory for storing the recalibrated bams
-				normal_recalibrated_directory = directory + "/recalibrated_bams" + "/" + sample_name[i] + "_NL"
-				tumor_recalibrated_directory = directory + "/recalibrated_bams" + "/" + sample_name[i] + "_TU"
-				os.makedirs(normal_recalibrated_directory)
-				os.makedirs(tumor_recalibrated_directory)
+				normal_out_directory = directory + "/recalibrated_bams" + "/" + sample_name[i] + "_NL"
+				tumor_out_directory = directory + "/recalibrated_bams" + "/" + sample_name[i] + "_TU"
+				os.makedirs(normal_out_directory)
+				os.makedirs(tumor_out_directory)
 				# Copy the recalibrated bams to the required directory
 				sys.stdout.flush()
-				os_call = "cp "+normal_directory+"/"+"out.recal.quality.bam"+" "+normal_recalibrated_directory+"/"
-				print "Copying recalibrated normal file to the recalibrated folder"
+				os_call = "cp "+normal_directory+"/"+"out.recal.quality.bam"+" "+normal_out_directory+"/"
+				print "Copying recalibrated normal file to the recalibrated out folder"
 				os.system(os_call)
-				os_call = "cp "+normal_directory+"/"+"out.recal.quality.bam.bai"+" "+normal_recalibrated_directory+"/"
-				print "Copying recalibrated tumor file to the recalibrated folder"
+				os_call = "cp "+normal_directory+"/"+"out.recal.quality.bam.bai"+" "+normal_out_directory+"/"
+				print "Copying recalibrated tumor file to the recalibrated out folder"
 				os.system(os_call)
 				sys.stdout.flush()
-				os_call = "cp "+tumor_directory+"/"+"out.recal.quality.bam"+" "+tumor_recalibrated_directory+"/"
+				os_call = "cp "+tumor_directory+"/"+"out.recal.quality.bam"+" "+tumor_out_directory+"/"
 				os.system(os_call)
-				os_call = "cp "+tumor_directory+"/"+"out.recal.quality.bam.bai"+" "+tumor_recalibrated_directory+"/"
+				os_call = "cp "+tumor_directory+"/"+"out.recal.quality.bam.bai"+" "+tumor_out_directory+"/"
 				os.system(os_call)
 
 				#-------------------------------------------------------------#
@@ -262,38 +263,39 @@ if (os.path.exists(sample_file)==True):
 
 				sys.stdout.flush()
 				print "Copying recalibrated normal bam files to HOPP storage server"
-				os_call = "cp"+" "+normal_recalibrated_directory+"/out.recal.quality.bam"+" "+path[0]+"/"+"recalibrated-"+normal_bam_file[i]
+				os_call = "cp"+" "+normal_out_directory+"/out.recal.quality.bam"+" "+path[0]+"/"+"recalibrated-"+normal_bam_file[i]
 				os.system(os_call)
-				os_call = "cp"+" "+normal_recalibrated_directory+"/out.recal.quality.bam.bai"+" "+path[0]+"/"+"recalibrated-"+normal_bam_file[i]+".bai"
+				os_call = "cp"+" "+normal_out_directory+"/out.recal.quality.bam.bai"+" "+path[0]+"/"+"recalibrated-"+normal_bam_file[i]+".bai"
 				os.system(os_call)
 				print "Copying recalibrated tumor bam files to HOPP storage server"
 				sys.stdout.flush()
-				os_call = "cp"+" "+tumor_recalibrated_directory+"/out.recal.quality.bam"+" "+path[0]+"/"+"recalibrated-"+tumor_bam_file[i]
+				os_call = "cp"+" "+tumor_out_directory+"/out.recal.quality.bam"+" "+path[0]+"/"+"recalibrated-"+tumor_bam_file[i]
 				os.system(os_call)
-				os_call = "cp"+" "+tumor_recalibrated_directory+"/out.recal.quality.bam.bai"+" "+path[0]+"/"+"recalibrated-"+tumor_bam_file[i]+".bai"
+				os_call = "cp"+" "+tumor_out_directory+"/out.recal.quality.bam.bai"+" "+path[0]+"/"+"recalibrated-"+tumor_bam_file[i]+".bai"
 				os.system(os_call)
 			else:
 				# If there is no recalibration necessary, make directories for storing the recalibrated bams
-				normal_recalibrated_directory = directory + "/recalibrated_bams" + "/" + sample_name[i] + "_NL"
-				tumor_recalibrated_directory = directory + "/recalibrated_bams" + "/" + sample_name[i] + "_TU"
-				os.makedirs(normal_recalibrated_directory)
-				os.makedirs(tumor_recalibrated_directory)
+				normal_out_directory = directory + "/nonrecalibrated_bams" + "/" + sample_name[i] + "_NL"
+				tumor_out_directory = directory + "/nonrecalibrated_bams" + "/" + sample_name[i] + "_TU"
+				os.makedirs(normal_out_directory)
+				os.makedirs(tumor_out_directory)
 				# Copy the recalibrated bams to the required directory
-				print "Copying recalibrated normal file to the folder"
+				print "Copying nonrecalibrated normal file to the folder"
 				sys.stdout.flush()
-				os_call = "cp "+path[0]+"/"+normal_bam_file[i]+" "+normal_recalibrated_directory+"/"+"out.recal.quality.bam"
+				os_call = "cp "+path[0]+"/"+normal_bam_file[i]+" "+normal_out_directory+"/"+"out.nonrecal.quality.bam"
 				os.system(os_call)
-				print "Indexing the recalibrated normal bam file"
+				print "Copying nonrecalibrated tumor file to the folder"
 				sys.stdout.flush()
-				os_call = SAM_INDEX_PATH+" "+normal_recalibrated_directory+"/"+"out.recal.quality.bam"
+				os_call = "cp "+path[0]+"/"+tumor_bam_file[i]+" "+tumor_out_directory+"/"+"out.nonrecal.quality.bam"
 				os.system(os_call)
-				print "Copying recalibrated tumor file to the folder"
+				# to add: check if index for recalibrated bam exists first
+				print "Indexing the nonrecalibrated normal bam file"
 				sys.stdout.flush()
-				os_call = "cp "+path[0]+"/"+tumor_bam_file[i]+" "+tumor_recalibrated_directory+"/"+"out.recal.quality.bam"
+				os_call = SAM_INDEX_PATH+" "+normal_out_directory+"/"+"out.nonrecal.quality.bam"
 				os.system(os_call)
-				print "Indexing the recalibrated tumor bam file"
+				print "Indexing the nonrecalibrated tumor bam file"
 				sys.stdout.flush()
-				os_call = SAM_INDEX_PATH+" "+tumor_recalibrated_directory+"/"+"out.recal.quality.bam"
+				os_call = SAM_INDEX_PATH+" "+tumor_out_directory+"/"+"out.nonrecal.quality.bam"
 				os.system(os_call)
 
 		#-------------------------------------------------------------#
@@ -303,24 +305,32 @@ if (os.path.exists(sample_file)==True):
 		#-------------------------------------------------------------#
 		
 		# Define normal and tumor directories
-		normal_recalibrated_directory = directory + "/recalibrated_bams" + "/" + sample_name[i] + "_NL"
-		tumor_recalibrated_directory = directory + "/recalibrated_bams" + "/" + sample_name[i] + "_TU"
-		recalibrated_normal_file = normal_recalibrated_directory+"/"+"out.recal.quality.bam"
-		recalibrated_tumor_file = tumor_recalibrated_directory+"/"+"out.recal.quality.bam"
+		if (args['recalibrate'] == 'RECALIBRATE'):
+			normal_out_directory = directory + "/recalibrated_bams" + "/" + sample_name[i] + "_NL"
+			tumor_out_directory = directory + "/recalibrated_bams" + "/" + sample_name[i] + "_TU"
+			normal_out_file = normal_out_directory+"/"+"out.recal.quality.bam"
+			tumor_out_file = tumor_out_directory+"/"+"out.recal.quality.bam"
+			recalibrate = "RECALIBRATE"
+		else:
+			normal_out_directory = directory + "/nonrecalibrated_bams" + "/" + sample_name[i] + "_NL"
+			tumor_out_directory = directory + "/nonrecalibrated_bams" + "/" + sample_name[i] + "_TU"
+			normal_out_file = normal_out_directory+"/"+"out.nonrecal.quality.bam"
+			tumor_out_file = tumor_out_directory+"/"+"out.nonrecal.quality.bam"
+			recalibrate = "NONRECALIBRATE"
 
 		# Check if the recalibrated files exists
-		if not os.path.exists(recalibrated_normal_file):
-			print 'Recalibrated normal file  not existant'
+		if not os.path.exists(normal_out_file):
+			print 'Recalibrated normal file not existant'
 			sys.exit(1)
-		if not os.path.exists(recalibrated_tumor_file):
+		if not os.path.exists(tumor_out_file):
 			print 'Recalibrated tumor file  not existant'
 			sys.exit(1)
-		# Check of the appropriate callers are present and if so make calls	
+		# Check of the appropriate callers are present and if so make calls
 		if (somatic_sniper_flag == 1):
 			print "-------------------------------------------------------------"
 			print "Calling somatic mutations using Somatic Sniper"
 			sys.stdout.flush()
-			os_call = SOMATIC_SNIPER_PATH+" "+tumor_recalibrated_directory+" "+normal_recalibrated_directory+" "+somatic_sniper_directory+" "+sample_name[i]
+			os_call = SOMATIC_SNIPER_PATH+" "+tumor_out_directory+" "+normal_out_directory+" "+somatic_sniper_directory+" "+sample_name[i]+" "+recalibrate
 			os.system(os_call)
 		if (somatic_indel_flag == 1):
 			if (bedfile_flag == 1):
@@ -328,14 +338,14 @@ if (os.path.exists(sample_file)==True):
 				print "Calling somatic indels with intervals list"
 				print "-------------------------------------------------------------"
 				sys.stdout.flush()
-				os_call = SOMATIC_INDEL_INTERVAL_PATH+" "+normal_recalibrated_directory+" "+tumor_recalibrated_directory+" "+somatic_indel_directory+" "+sample_name[i]+" "+bedfile_name
+				os_call = SOMATIC_INDEL_INTERVAL_PATH+" "+normal_out_directory+" "+tumor_out_directory+" "+somatic_indel_directory+" "+sample_name[i]+" "+bedfile_name+" "+recalibrate
 				os.system(os_call)
 			else:
 				print "-------------------------------------------------------------"
 				print "Calling somatic indels"
 				print "-------------------------------------------------------------"
 				sys.stdout.flush()
-				os_call = SOMATIC_INDEL_PATH+" "+normal_recalibrated_directory+" "+tumor_recalibrated_directory+" "+somatic_indel_directory+" "+sample_name[i]
+				os_call = SOMATIC_INDEL_PATH+" "+normal_out_directory+" "+tumor_out_directory+" "+somatic_indel_directory+" "+sample_name[i]+" "+recalibrate
 				os.system(os_call)
 		if (mutect_flag == 1):
 			if (bedfile_flag == 1):
@@ -343,14 +353,14 @@ if (os.path.exists(sample_file)==True):
 				print "Calling muTect with intervals list"
 				print "-------------------------------------------------------------"
 				sys.stdout.flush()
-				os_call = MUTECT_INTERVAL_PATH+" "+tumor_recalibrated_directory+" "+normal_recalibrated_directory+" "+mutect_directory+" "+sample_name[i]+" "+bedfile_name
+				os_call = MUTECT_INTERVAL_PATH+" "+tumor_out_directory+" "+normal_out_directory+" "+mutect_directory+" "+sample_name[i]+" "+bedfile_name+" "+recalibrate
 				os.system(os_call)
 			else:
 				print "-------------------------------------------------------------"
 				print "Calling muTect"
 				print "-------------------------------------------------------------"
 				sys.stdout.flush()
-				os_call = MUTECT_PATH+" "+tumor_recalibrated_directory+" "+normal_recalibrated_directory+" "+mutect_directory+" "+sample_name[i]
+				os_call = MUTECT_PATH+" "+tumor_out_directory+" "+normal_out_directory+" "+mutect_directory+" "+sample_name[i]+" "+recalibrate
 				os.system(os_call)
 		if (unified_genotyper_flag == 1):
 			if (bedfile_flag == 1):
@@ -358,14 +368,14 @@ if (os.path.exists(sample_file)==True):
 				print "Calling Unified Genotyper with intervals list"
 				print "-------------------------------------------------------------"
 				sys.stdout.flush()
-				os_call = UNIFIED_GENOTYPER_INTERVAL_PATH+" "+tumor_recalibrated_directory+" "+normal_recalibrated_directory+" "+unified_genotyper_directory+" "+sample_name[i]+" "+bedfile_name
+				os_call = UNIFIED_GENOTYPER_INTERVAL_PATH+" "+tumor_out_directory+" "+normal_out_directory+" "+unified_genotyper_directory+" "+sample_name[i]+" "+bedfile_name+" "+recalibrate
 				os.system(os_call)
 			else:
 				print "-------------------------------------------------------------"
 				print "Calling Unified Genotyper on all intervals"
 				print "-------------------------------------------------------------"
 				sys.stdout.flush()
-				os_call = UNIFIED_GENOTYPER_PATH+" "+tumor_recalibrated_directory+" "+normal_recalibrated_directory+" "+unified_genotyper_directory+" "+sample_name[i]
+				os_call = UNIFIED_GENOTYPER_PATH+" "+tumor_out_directory+" "+normal_out_directory+" "+unified_genotyper_directory+" "+sample_name[i]+" "+recalibrate
 				os.system(os_call)
 else:
 	print 'Sample information file is non-existent. Please make sure you give valid sample info file with path.'
